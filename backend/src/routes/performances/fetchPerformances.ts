@@ -1,16 +1,25 @@
-import {load} from "cheerio";
 import {fetchWithDailyCache} from "../../services/fetchHandler";
+import {HTMLUListElement, Window} from 'happy-dom'
+import {parse, setYear} from "date-fns";
+
+const MONTH_REGEX =
+    /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i;
+
 
 export async function getBreakLegPerformances() {
-    const  html = fetchWithDailyCache("breaklegs-performances", 'https://goodshow.breaklegs.com/performances-by-show/')
+    const  html = await fetchWithDailyCache("breaklegs-performances", 'https://goodshow.breaklegs.com/performances-by-show/')
 
-    const $ = load(html);
-    const $individualListings = $('.listings li');
-    const listings = $individualListings.get().map(el => {
-        const $listing = load(el);
-        const dateString = $listing('.dates').text()
-            .replace('Closes Today', '')
-            .replace('Closes Tomorrow', '');
+    const window = new Window();
+    const document = window.document;
+    document.body.innerHTML = html;
+    const $individualListings = document.querySelectorAll('.listings li');
+
+    const listings = [...$individualListings].map(el => {
+        const dateSectionText = el.querySelector('.dates')!.textContent;
+        const match = dateSectionText.match(MONTH_REGEX);
+
+        const dateString = dateSectionText.slice(match!.index!);
+
         let dates;
         if (dateString.includes('-')) {
             dates = dateString.split('-');
@@ -22,22 +31,32 @@ export async function getBreakLegPerformances() {
                 dates[1] = `${month} ${dates[1]}`
             }
         } else {
-            dates = [dateString]
+            dates = [dateString.trim()]
+        }
+
+
+        let  startDate =  parse(dates[0], 'MMMM d', new Date());
+        startDate = setYear(startDate, 2026)
+
+        let endDate: Date | null= null
+        if (dates[1]) {
+            endDate =  parse(dates[1], 'MMMM d', new Date());
+            endDate = setYear(endDate, 2026)
         }
 
         const retval = {
-            name: $listing('.text').text(),
-            startDate: dates[0],
-            endDate: dates[1] ?? "n/a",
-            company: $listing('.detail-text').text(),
-            id: el.attribs['data-id'],
-            tags: $listing('.filters span').get().map(el => load(el).text())
+            name: el.querySelector('.text')?.textContent,
+            startDate: startDate.toISOString(),
+            endDate: endDate?.toISOString(),
+            company: el.querySelector('.detail-text')?.textContent,
+            id: el.attributes.getNamedItem('data-id')?.value,
+            tags: [...el.querySelectorAll('.filters span')].map(el => el.textContent)
         }
 
         return retval;
     })
 
-    return {listings}
+    return listings
 }
 
 export async function getBreakLegTheaters() {

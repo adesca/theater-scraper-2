@@ -6,8 +6,8 @@ router.use(express.json())
 
 router.get('', async (req, res) => {
   const listings = await getBreakLegPerformances();
-  const theaters = await getBreakLegTheaters()
-  res.send({ listings, theaters})
+  // const theaters = await getBreakLegTheaters()
+  res.send({ listings})
 })
 
 
