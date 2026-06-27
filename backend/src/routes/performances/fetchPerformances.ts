@@ -1,12 +1,16 @@
 import {load} from "cheerio";
+import {fetchWithDailyCache} from "../../services/fetchHandler";
 
 export async function getBreakLegPerformances() {
-    const html = await (await fetch('https://goodshow.breaklegs.com/performances-by-show/')).text()
+    const  html = fetchWithDailyCache("breaklegs-performances", 'https://goodshow.breaklegs.com/performances-by-show/')
+
     const $ = load(html);
     const $individualListings = $('.listings li');
     const listings = $individualListings.get().map(el => {
         const $listing = load(el);
-        const dateString = $listing('.secondary-detail-text').text();
+        const dateString = $listing('.dates').text()
+            .replace('Closes Today', '')
+            .replace('Closes Tomorrow', '');
         let dates;
         if (dateString.includes('-')) {
             dates = dateString.split('-');
