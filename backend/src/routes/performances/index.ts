@@ -1,9 +1,14 @@
-import { type FastifyPluginAsync } from 'fastify'
+import {getBreakLegPerformances, getBreakLegTheaters} from "./fetchPerformances";
+import express from "express";
 
-const performances: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
-  fastify.get('/', async function (request, reply) {
-    return { performances: []}
-  })
-}
+const router = express.Router();
+router.use(express.json())
 
-export default performances
+router.get('', async (req, res) => {
+  const listings = await getBreakLegPerformances();
+  const theaters = await getBreakLegTheaters()
+  res.send({ listings, theaters})
+})
+
+
+export default router
