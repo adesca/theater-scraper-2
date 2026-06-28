@@ -18,7 +18,6 @@ export async function fetchWithDailyCache(
     const cachePath = join(cacheDir, `${filename}.html`);
 
     try {
-        console.log(`checking cache for ${identifier}`)
         return await readFile(cachePath, "utf8");
     } catch {
         console.log(`Cache missed for ${identifier}, fetching fresh response`)

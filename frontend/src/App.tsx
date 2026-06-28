@@ -9,23 +9,15 @@ import {Listings} from "./listings.tsx";
 function App() {
     const [displayedPerformancesFilters, setFilters] = useState<Partial<Filters> | null>();
 
-  return (
-      <div className="drawer drawer-open">
-          <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
-          <div className="drawer-content flex flex-col items-center justify-center">
+    return <div className="grid md:grid-cols-[20rem_1fr] gap-6">
+        <aside className="bg-base-200">
+            <SidePanel onFilterChange={setFilters}/>
+        </aside>
 
-              <label htmlFor="my-drawer-3" className="btn drawer-button lg:hidden">
-                  Filters
-              </label>
-
-              <Listings />
-          </div>
-          <div className="drawer-side">
-              <label htmlFor="my-drawer-3" aria-label="close sidebar" className="drawer-overlay"></label>
-              <SidePanel onFilterChange={setFilters} />
-          </div>
-      </div>
-  )
+        <main>
+            <Listings />
+        </main>
+    </div>
 }
 
 export default App

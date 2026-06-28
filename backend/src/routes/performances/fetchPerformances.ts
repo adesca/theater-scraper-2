@@ -1,5 +1,5 @@
 import {fetchWithDailyCache} from "../../services/fetchHandler";
-import {HTMLUListElement, Window} from 'happy-dom'
+import {HTMLSpanElement, HTMLUListElement, Window} from 'happy-dom'
 import {parse, setYear} from "date-fns";
 
 const MONTH_REGEX =
@@ -44,13 +44,17 @@ export async function getBreakLegPerformances() {
             endDate = setYear(endDate, 2026)
         }
 
+        const image = el.querySelector("span.image") as unknown as HTMLSpanElement;
+        const imageUrl: string | null = image.style.backgroundImage.match(/^url\(["']?(.*?)["']?\)$/)?.[1] ?? null;
+
         const retval = {
             name: el.querySelector('.text')?.textContent,
             startDate: startDate.toISOString(),
             endDate: endDate?.toISOString(),
             company: el.querySelector('.detail-text')?.textContent,
             id: el.attributes.getNamedItem('data-id')?.value,
-            tags: [...el.querySelectorAll('.filters span')].map(el => el.textContent)
+            tags: [...el.querySelectorAll('.filters span')].map(el => el.textContent),
+            imageUrl
         }
 
         return retval;
