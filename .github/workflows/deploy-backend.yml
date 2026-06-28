@@ -1,0 +1,41 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "../../backend"
+      - ".github/workflows/deploy-backend.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          port: ${{ secrets.DO_PORT || 22 }}
+          script: |
+            set -e
+
+            cd ~/theater-scraper-2
+
+            git fetch origin
+            git checkout main
+            git reset --hard origin/main
+
+            npm ci --prefix backend
+            npm run --prefix backend build
+
+            if pm2 describe theater-scraper-2-backend > /dev/null; then
+              pm2 reload theater-scraper-2-backend
+            else
+              pm2 start backend/dist/server.js --name theater-scraper-2-backend
+            fi
+
+            pm2 save

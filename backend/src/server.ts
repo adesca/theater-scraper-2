@@ -3,7 +3,7 @@ import cors from 'cors';
 import performanceRoute from './routes/performances'
 
 const app = express()
-const port = 3000
+const port = process.env.ENV !== 'dev' ? 4000 : 3000;
 
 
 const corsOpts = process.env.ENV !== 'dev' ? {origin: 'https://adesca.github.io'} : undefined
