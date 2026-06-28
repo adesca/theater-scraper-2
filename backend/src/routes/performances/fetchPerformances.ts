@@ -42,6 +42,8 @@ export async function getBreakLegPerformances() {
         if (dates[1]) {
             endDate =  parse(dates[1], 'MMMM d', new Date());
             endDate = setYear(endDate, 2026)
+        } else {
+            endDate = startDate;
         }
 
         const image = el.querySelector("span.image") as unknown as HTMLSpanElement;

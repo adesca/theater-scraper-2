@@ -7,7 +7,7 @@ import {Listings} from "./listings.tsx";
 
 
 function App() {
-    const [displayedPerformancesFilters, setFilters] = useState<Partial<Filters> | null>();
+    const [displayedPerformancesFilters, setFilters] = useState<Partial<Filters>>({});
 
     return <div className="grid md:grid-cols-[20rem_1fr] gap-6">
         <aside className="bg-base-200">
@@ -15,7 +15,7 @@ function App() {
         </aside>
 
         <main>
-            <Listings />
+            <Listings filters={displayedPerformancesFilters} />
         </main>
     </div>
 }
