@@ -10,6 +10,11 @@ export function SidePanel(props: Props) {
     const [selectedFilter, setSelectedFilter] = useState<string | number>("")
 
     function selectFilter<T extends keyof Filters>(filterType: NonNullable<T>, value: NonNullable<Filters[T]>) {
+        if (selectedFilter === value) {
+            setSelectedFilter("")
+            props.onFilterChange({})
+            return;
+        }
         const filterChangeInput: Filters = {}
         filterChangeInput[filterType] = value;
         props.onFilterChange(filterChangeInput)

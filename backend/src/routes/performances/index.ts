@@ -1,4 +1,4 @@
-import {getBreakLegPerformances, getBreakLegTheaters} from "./fetchPerformances";
+import {getBreakLegPerformances} from "./fetchPerformances";
 import express from "express";
 
 const router = express.Router();

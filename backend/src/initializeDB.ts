@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-sqlite';
-import {DB_FILE_NAME} from "../constants";
+import {DB_FILE_NAME} from "./constants";
 
 let db: ReturnType<typeof drizzle>;
 export async function getDB() {

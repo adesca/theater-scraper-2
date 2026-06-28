@@ -24,9 +24,12 @@ export function Listings(props: Props) {
 
                 return true;
             })
-        return <span className={'flex flex-wrap'}>
-            <div>Showing {listingsToShow.length} of {res.data.listings.length} show listings</div>
-            {listingsToShow.map(l => <Listing key={`${l.name}-${l.company}`} {...l} />)}
+        return <span>
+            <div>{listingsToShow.length} / {res.data.listings.length} show listings</div>
+            <div className={'flex flex-wrap'}>
+                {listingsToShow.map(l => <Listing key={`${l.name}-${l.company}`} {...l} />)}
+            </div>
+
         </span>
     } else {
         return <></>

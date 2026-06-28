@@ -5,7 +5,9 @@ import performanceRoute from './routes/performances'
 const app = express()
 const port = 3000
 
-app.use(cors())
+
+const corsOpts = process.env.ENV !== 'dev' ? {origin: 'https://adesca.github.io'} : undefined
+app.use(cors(corsOpts))
 
 app.get('/', (req, res) => {
     res.send('Hello World!')

@@ -66,18 +66,18 @@ export async function getBreakLegPerformances() {
 }
 
 export async function getBreakLegTheaters() {
-    const directoryHtml = await (await  fetch('https://goodshow.breaklegs.com/directory/')).text();
-    const $directoryPage = load(directoryHtml);
-    const theaters = $directoryPage('.listings li').get().map((el) => {
-        const $listing = load(el);
-        const theaterName = $listing('.contents .text').text();
-        return {
-            id: el.attribs['data-id'] || theaterName,
-            theaterName,
-            address: $listing('.contents .detail-text').text(),
-            website: $listing('.contents .details').text()
-        }
-    });
-
-    return theaters;
+    // const directoryHtml = await (await  fetch('https://goodshow.breaklegs.com/directory/')).text();
+    // const $directoryPage = load(directoryHtml);
+    // const theaters = $directoryPage('.listings li').get().map((el) => {
+    //     const $listing = load(el);
+    //     const theaterName = $listing('.contents .text').text();
+    //     return {
+    //         id: el.attribs['data-id'] || theaterName,
+    //         theaterName,
+    //         address: $listing('.contents .detail-text').text(),
+    //         website: $listing('.contents .details').text()
+    //     }
+    // });
+    //
+    // return theaters;
 }
