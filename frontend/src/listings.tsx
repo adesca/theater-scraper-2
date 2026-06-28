@@ -67,6 +67,7 @@ interface Listing {
     imageUrl: string | null
 }
 
+console.log('hi', import.meta.env)
 function useFetchListings() {
     return useQuery({
         queryKey: ['listings'],

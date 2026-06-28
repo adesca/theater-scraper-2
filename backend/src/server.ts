@@ -6,7 +6,7 @@ const app = express()
 const port = process.env.ENV !== 'dev' ? 4000 : 3000;
 
 
-const corsOpts = process.env.ENV !== 'dev' ? {origin: 'https://adesca.github.io'} : undefined
+const corsOpts = process.env.ENV !== 'dev' ? {origin: 'https://theater.adesca.dev'} : undefined
 app.use(cors(corsOpts))
 
 app.get('/', (req, res) => {
