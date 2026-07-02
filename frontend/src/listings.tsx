@@ -1,5 +1,5 @@
 import type {Filters} from "./models.ts";
-import {useQuery} from "@tanstack/react-query";
+import {type Listing, useFetchListings} from "./useFetchListings.tsx";
 
 interface Props {
     filters: Filters
@@ -29,10 +29,12 @@ export function Listings(props: Props) {
             <div className={'flex flex-wrap'}>
                 {listingsToShow.map(l => <Listing key={`${l.name}-${l.company}`} {...l} />)}
             </div>
-
         </span>
     } else {
-        return <></>
+        return <span>
+            <div>- / -- show listings</div>
+            <span className="loading loading-bars loading-lg"></span>
+        </span>
     }
 }
 
@@ -59,22 +61,3 @@ function Listing(props: Listing) {
     </div>
 }
 
-interface Listing {
-    name: string,
-    company: string,
-    startDate: string,
-    endDate: string
-    imageUrl: string | null
-}
-
-console.log('hi', import.meta.env)
-function useFetchListings() {
-    return useQuery({
-        queryKey: ['listings'],
-        queryFn: () =>
-            fetch(`${import.meta.env.VITE_API_URL}/performances`)
-                .then((res) => res.json() as Promise<{
-                    listings: Listing[]
-                }>)
-    })
-}

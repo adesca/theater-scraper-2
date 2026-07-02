@@ -39,4 +39,5 @@ jobs:
             rm -rf /var/www/theater-scraper/*
             cp -r frontend/dist/. /var/www/theater-scraper/
 
-            pm2 restart theater-scraper-2-backend
+            pm2 startOrReload ecosystem.config.js --env production
+            pm2 save
