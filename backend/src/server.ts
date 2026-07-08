@@ -15,6 +15,6 @@ app.get('/', (req, res) => {
 
 app.use('/performances', performanceRoute);
 
-app.listen({host: '127.0.0.1', port}, () => {
+app.listen(port, '127.0.0.1', () => {
     console.log(`Example app listening on port ${port}`)
 })

@@ -8,14 +8,15 @@ export async function fetchWithDailyCache(
     url: string,
     cacheDir = DEFAULT_CACHE_DIR,
 ): Promise<string> {
-    await mkdir(cacheDir, { recursive: true });
+    const activeCacheDir = process.env.THEATER_SCRAPER_CACHE_DIR ?? cacheDir;
+    await mkdir(activeCacheDir, { recursive: true });
 
     const today = new Date().toISOString().slice(0, 10);
     const filename = `${identifier}-${today}`.replace(
         /[<>:"/\\|?*\x00-\x1F]/g,
         "_",
     );
-    const cachePath = join(cacheDir, `${filename}.html`);
+    const cachePath = join(activeCacheDir, `${filename}.html`);
 
     try {
         return await readFile(cachePath, "utf8");
