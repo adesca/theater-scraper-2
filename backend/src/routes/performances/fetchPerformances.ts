@@ -1,13 +1,13 @@
 import {fetchWithDailyCache} from "../../services/fetchHandler";
-import {HTMLSpanElement, HTMLUListElement, Window} from 'happy-dom'
+import {HTMLSpanElement, Window} from 'happy-dom'
 import {parse, setYear} from "date-fns";
+import {Listing} from "./models";
 
 const MONTH_REGEX =
     /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i;
 
-
-export async function getBreakLegPerformances() {
-    const  html = await fetchWithDailyCache("breaklegs-performances", 'https://goodshow.breaklegs.com/performances-by-show/')
+export async function getBreakLegPerformances(): Promise<Listing[]> {
+    const {body: html} = await fetchWithDailyCache('https://goodshow.breaklegs.com/performances-by-show/')
 
     const window = new Window();
     const document = window.document;
@@ -62,7 +62,7 @@ export async function getBreakLegPerformances() {
         return retval;
     })
 
-    return listings
+    return listings.filter(l => l.name && l.company) as Listing[];
 }
 
 export async function getBreakLegTheaters() {
