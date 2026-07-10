@@ -1,9 +1,9 @@
-import assert from 'node:assert/strict';
-import { mkdtemp, rm } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { afterEach, test } from 'node:test';
-import { getBreakLegPerformances } from '../../../src/routes/performances/fetchPerformances';
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+import { getBreakLegPerformances } from "../../../src/routes/performances/fetchPerformances";
 
 const originalFetch = globalThis.fetch;
 const originalCacheDir = process.env.THEATER_SCRAPER_CACHE_DIR;
@@ -11,6 +11,7 @@ const tempDirs: string[] = [];
 
 afterEach(async () => {
   globalThis.fetch = originalFetch;
+  vi.restoreAllMocks();
 
   if (originalCacheDir === undefined) {
     delete process.env.THEATER_SCRAPER_CACHE_DIR;
@@ -19,12 +20,17 @@ afterEach(async () => {
   }
 
   await Promise.all(
-    tempDirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true })),
+      tempDirs.splice(0).map((dir) =>
+          rm(dir, { recursive: true, force: true }),
+      ),
   );
 });
 
 async function useTempCacheDir() {
-  const dir = await mkdtemp(join(tmpdir(), 'theater-scraper-performances-test-'));
+  const dir = await mkdtemp(
+      join(tmpdir(), "theater-scraper-performances-test-"),
+  );
+
   tempDirs.push(dir);
   process.env.THEATER_SCRAPER_CACHE_DIR = dir;
 }
@@ -60,57 +66,62 @@ const performancesHtml = String.raw`
 </html>
 `;
 
-test('parses BreakLeg performance listings from the external HTML', async () => {
-  await useTempCacheDir();
+describe("getBreakLegPerformances", () => {
+  it("parses BreakLeg performance listings from the external HTML", async () => {
+    await useTempCacheDir();
 
-  globalThis.fetch = async () =>
-    new Response(performancesHtml, {
-      status: 200,
-      statusText: 'OK',
-      headers: {
-        'content-type': 'text/html; charset=utf-8',
-      },
+    globalThis.fetch = vi.fn(async () => {
+      return new Response(performancesHtml, {
+        status: 200,
+        statusText: "OK",
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+        },
+      });
     });
 
-  const listings = await getBreakLegPerformances();
+    const listings = await getBreakLegPerformances();
 
-  assert.equal(listings.length, 3);
-  assert.deepEqual(
-    listings.map((listing) => listing.name),
-    ['One Night Only', 'Summer Comedy', 'Fall Drama'],
-  );
-  assert.equal(listings[0].company, 'Downtown Theater');
-  assert.equal(listings[0].id, 'single-performance');
-  assert.deepEqual(listings[0].tags, ['solo', 'music']);
-  assert.equal(listings[0].imageUrl, 'https://images.test/single.jpg');
-  assert.match(listings[0].startDate, /^2026-07-04T/);
-  assert.equal(listings[0].endDate, listings[0].startDate);
+    expect(listings).toHaveLength(3);
 
-  assert.equal(listings[1].company, 'Northside Players');
-  assert.match(listings[1].startDate, /^2026-08-02T/);
-  assert.match(listings[1].endDate, /^2026-08-09T/);
+    expect(listings.map((listing) => listing.name)).toEqual([
+      "One Night Only",
+      "Summer Comedy",
+      "Fall Drama",
+    ]);
 
-  assert.equal(listings[2].company, 'Lakefront Stage');
-  assert.match(listings[2].startDate, /^2026-09-28T/);
-  assert.match(listings[2].endDate, /^2026-10-03T/);
-});
+    expect(listings[0].company).toBe("Downtown Theater");
+    expect(listings[0].id).toBe("single-performance");
+    expect(listings[0].tags).toEqual(["solo", "music"]);
+    expect(listings[0].imageUrl).toBe(
+        "https://images.test/single.jpg",
+    );
+    expect(listings[0].startDate).toMatch(/^2026-07-04T/);
+    expect(listings[0].endDate).toBe(listings[0].startDate);
 
-test('reuses cached BreakLeg HTML after the first parser request', async () => {
-  await useTempCacheDir();
-  let fetchCount = 0;
+    expect(listings[1].company).toBe("Northside Players");
+    expect(listings[1].startDate).toMatch(/^2026-08-02T/);
+    expect(listings[1].endDate).toMatch(/^2026-08-09T/);
 
-  globalThis.fetch = async () => {
-    fetchCount += 1;
+    expect(listings[2].company).toBe("Lakefront Stage");
+    expect(listings[2].startDate).toMatch(/^2026-09-28T/);
+    expect(listings[2].endDate).toMatch(/^2026-10-03T/);
+  });
 
-    return new Response(performancesHtml, {
-      status: 200,
-      statusText: 'OK',
+  it("reuses cached BreakLeg HTML after the first parser request", async () => {
+    await useTempCacheDir();
+
+    globalThis.fetch = vi.fn(async () => {
+      return new Response(performancesHtml, {
+        status: 200,
+        statusText: "OK",
+      });
     });
-  };
 
-  const firstListings = await getBreakLegPerformances();
-  const secondListings = await getBreakLegPerformances();
+    const firstListings = await getBreakLegPerformances();
+    const secondListings = await getBreakLegPerformances();
 
-  assert.equal(fetchCount, 1);
-  assert.deepEqual(secondListings, firstListings);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    expect(secondListings).toEqual(firstListings);
+  });
 });

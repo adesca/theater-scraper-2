@@ -1,3 +1,4 @@
+console.trace("fetchHandler imported");
 import { createHash } from "node:crypto";
 import {
     mkdir,
@@ -27,6 +28,14 @@ export async function fetchWithDailyCache(
     cacheDir = DEFAULT_CACHE_DIR,
 ): Promise<CachedResponse> {
     const activeCacheDir = process.env.THEATER_SCRAPER_CACHE_DIR ?? cacheDir;
+
+    if (activeCacheDir.startsWith("http")) {
+        console.trace("HTTP used as cache dir", {
+            url,
+            cacheDir,
+            activeCacheDir,
+        });
+    }
 
     await mkdir(activeCacheDir, { recursive: true });
     console.log('hash', hashUrl(url))
