@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import {ticketsPage} from "../../backend/src/routes/performances/ntpaFixtures";
 
 const breakLegPerformancesHtml = String.raw`
 <!doctype html>
@@ -40,6 +41,14 @@ const server = setupServer(
       },
     });
   }),
+
+    http.get('https://ntpa.org/tickets/', () => {
+      return HttpResponse.text(ticketsPage, {
+        headers: {
+          'content-type': 'text/html; charset=utf-8',
+        },
+      });
+    }),
 );
 
 async function main() {

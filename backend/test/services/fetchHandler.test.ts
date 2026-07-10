@@ -5,7 +5,6 @@ import { join } from "node:path";
 import { createHash } from "node:crypto";
 
 import { fetchWithDailyCache } from "../../src/services/fetchHandler";
-console.trace('hi')
 
  const originalFetch = globalThis.fetch;
  const tempDirs: string[] = [];
@@ -66,7 +65,6 @@ describe("fetchWithDailyCache", () => {
 
     const url = "https://example.test/performances";
 
-    console.log(cacheDir)
     await fetchWithDailyCache(url, cacheDir);
 
     const cachedBody = await readFile(
