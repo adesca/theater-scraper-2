@@ -1,5 +1,6 @@
 import type {Filters} from "./models.ts";
 import {type Listing, useFetchListings} from "./useFetchListings.tsx";
+import {VersionInfoComponent} from "./VersionInfoComponent.tsx";
 
 interface Props {
     filters: Filters
@@ -25,7 +26,13 @@ export function Listings(props: Props) {
                 return true;
             })
         return <span>
-            <div>{listingsToShow.length} / {res.data.listings.length} show listings</div>
+            <div className="flex flex-wrap items-end">
+                <span className="mr-auto">
+                     {listingsToShow.length} / {res.data.listings.length} show listings
+                </span>
+
+                <VersionInfoComponent />
+            </div>
             <div className={'flex flex-wrap'}>
                 {listingsToShow.map(l => <Listing key={`${l.name}-${l.company}`} {...l} />)}
             </div>

@@ -1,17 +1,17 @@
 import {fetchWithDailyCache} from "../../services/fetchHandler";
-import {HTMLSpanElement, Window} from 'happy-dom'
+import {DOMParser} from 'linkedom';
 import {parse, setYear} from "date-fns";
 import {Listing} from "./models";
 
 const MONTH_REGEX =
     /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i;
 
+const domParser = new DOMParser;
 export async function getBreakLegPerformances(): Promise<Listing[]> {
     const {body: html} = await fetchWithDailyCache('https://goodshow.breaklegs.com/performances-by-show/')
 
-    const window = new Window();
-    const document = window.document;
-    document.body.innerHTML = html;
+    const document = domParser.parseFromString(html, 'text/html')
+
     const $individualListings = document.querySelectorAll('.listings li');
 
     const listings = [...$individualListings].map(el => {

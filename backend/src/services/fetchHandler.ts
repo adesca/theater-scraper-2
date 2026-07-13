@@ -36,6 +36,7 @@ export async function fetchWithDailyCache(
         const fileStats = await stat(cachePath);
 
         if (isSameUtcDay(fileStats.mtime, new Date())) {
+            console.info(`Cache hit for ${url}`);
             return {
                 body: await readFile(cachePath, "utf8"),
                 cachedAt: fileStats.mtime,
@@ -45,7 +46,7 @@ export async function fetchWithDailyCache(
         // Cache miss or file doesn't exist.
     }
 
-    console.log(`Cache miss for ${url}, fetching fresh response`);
+    console.info(`Cache miss for ${url}, fetching fresh response`);
 
     const response = await fetch(url);
 

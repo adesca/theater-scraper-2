@@ -7,6 +7,17 @@ const router = express.Router();
 router.use(express.json())
 
 router.get('', async (req, res) => {
+  // const before = process.memoryUsage().heapUsed;
+  // res.on("finish", () => {
+  //   global.gc?.();
+  //
+  //   const after = process.memoryUsage().heapUsed;
+  //
+  //   console.log(
+  //       `${req.path}: ${Math.round(before / 1024 / 1024)}MB -> ${Math.round(after / 1024 / 1024)}MB`
+  //   );
+  // });
+
   const listings = await fetchPerformances();
   // const theaters = await getBreakLegTheaters()
   res.send({ listings})
@@ -18,6 +29,8 @@ async function fetchPerformances(): Promise<Listing[]> {
     ntpa: await getNTPAPerformances()
   }
 
+  // await window.happyDOM.close()
+  // window.close()
   return Object.values(allPerformances).flat();
 }
 

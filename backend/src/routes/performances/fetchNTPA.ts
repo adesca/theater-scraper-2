@@ -1,14 +1,13 @@
 import {Listing} from "./models";
 import {fetchWithDailyCache} from "../../services/fetchHandler";
-import {HTMLAnchorElement, HTMLDivElement, HTMLSpanElement, Window} from "happy-dom";
 import {parse} from "date-fns";
+import {DOMParser} from "linkedom";
 
+const domParser = new DOMParser;
 export async function getNTPAPerformances(): Promise<Listing[]> {
     const {body} = await fetchWithDailyCache('https://ntpa.org/tickets/')
 
-    const window = new Window();
-    const document = window.document;
-    document.body.innerHTML = body;
+    const document = domParser.parseFromString(body, 'text/html')
 
     const retval = [...document.querySelectorAll('.fusion-events-post')]
         .map($listing => {
@@ -29,6 +28,5 @@ export async function getNTPAPerformances(): Promise<Listing[]> {
             }
         })
         .filter(listing => !!listing) as Listing[];
-
     return retval;
 }
