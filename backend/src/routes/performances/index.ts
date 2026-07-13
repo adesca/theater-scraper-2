@@ -29,8 +29,6 @@ async function fetchPerformances(): Promise<Listing[]> {
     ntpa: await getNTPAPerformances()
   }
 
-  // await window.happyDOM.close()
-  // window.close()
   return Object.values(allPerformances).flat();
 }
 

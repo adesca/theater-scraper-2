@@ -1,6 +1,5 @@
 import type {Filters} from "./models.ts";
 import {type Listing, useFetchListings} from "./useFetchListings.tsx";
-import {VersionInfoComponent} from "./VersionInfoComponent.tsx";
 
 interface Props {
     filters: Filters
@@ -30,8 +29,6 @@ export function Listings(props: Props) {
                 <span className="mr-auto">
                      {listingsToShow.length} / {res.data.listings.length} show listings
                 </span>
-
-                <VersionInfoComponent />
             </div>
             <div className={'flex flex-wrap'}>
                 {listingsToShow.map(l => <Listing key={`${l.name}-${l.company}`} {...l} />)}
@@ -40,7 +37,32 @@ export function Listings(props: Props) {
     } else {
         return <span>
             <div>- / -- show listings</div>
-            <span className="loading loading-bars loading-lg"></span>
+            <div className={'flex'}>
+                <div className={'skeleton h-32 w-32'} />
+                <div className={'flex flex-col pl-2 pt-8'}>
+                    <div className={'skeleton h-4 w-64'} />
+                    <div className={'skeleton h-4 w-32 mt-4'} />
+                    <div className={'skeleton h-4 w-32 mt-4'} />
+                </div>
+            </div>
+
+            <div className={'flex'}>
+                <div className={'skeleton h-32 w-32'} />
+                <div className={'flex flex-col pl-2 pt-8'}>
+                    <div className={'skeleton h-4 w-64'} />
+                    <div className={'skeleton h-4 w-32 mt-4'} />
+                    <div className={'skeleton h-4 w-32 mt-4'} />
+                </div>
+            </div>
+
+            <div className={'flex'}>
+                <div className={'skeleton h-32 w-32'} />
+                <div className={'flex flex-col pl-2 pt-8'}>
+                    <div className={'skeleton h-4 w-64'} />
+                    <div className={'skeleton h-4 w-32 mt-4'} />
+                    <div className={'skeleton h-4 w-32 mt-4'} />
+                </div>
+            </div>
         </span>
     }
 }
