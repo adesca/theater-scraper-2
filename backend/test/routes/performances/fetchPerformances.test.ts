@@ -3,7 +3,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { getBreakLegPerformances } from "../../../src/routes/performances/fetchPerformances";
+import { getBreakLegPerformances } from "../../../src/routes/fetchBreaklegs";
 
 const originalFetch = globalThis.fetch;
 const originalCacheDir = process.env.THEATER_SCRAPER_CACHE_DIR;

@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
-import {ticketsPage} from "../../backend/src/routes/performances/ntpaFixtures";
+import {ticketsPage} from "../../backend/src/routes/ntpaFixtures";
 
 const breakLegPerformancesHtml = String.raw`
 <!doctype html>

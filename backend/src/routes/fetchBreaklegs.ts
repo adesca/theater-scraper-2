@@ -1,18 +1,18 @@
-import {fetchWithDailyCache} from "../../services/fetchHandler";
+import {fetchWithDailyCache} from "../services/fetchHandler";
 import {DOMParser} from 'linkedom';
 import {parse, setYear} from "date-fns";
-import {Listing} from "./models";
+import {Listing} from "./performances/models";
+import {parseDocument} from "../helper";
 
 const MONTH_REGEX =
     /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i;
 
-const domParser = new DOMParser;
 export async function getBreakLegPerformances(): Promise<Listing[]> {
     const {body: html} = await fetchWithDailyCache('https://goodshow.breaklegs.com/performances-by-show/')
 
-    const document = domParser.parseFromString(html, 'text/html')
+    const {$$} = parseDocument(html)
 
-    const $individualListings = document.querySelectorAll('.listings li');
+    const $individualListings = $$('.listings li');
 
     const listings = [...$individualListings].map(el => {
         const dateSectionText = el.querySelector('.dates')!.textContent;
@@ -66,18 +66,19 @@ export async function getBreakLegPerformances(): Promise<Listing[]> {
 }
 
 export async function getBreakLegTheaters() {
-    // const directoryHtml = await (await  fetch('https://goodshow.breaklegs.com/directory/')).text();
-    // const $directoryPage = load(directoryHtml);
-    // const theaters = $directoryPage('.listings li').get().map((el) => {
-    //     const $listing = load(el);
-    //     const theaterName = $listing('.contents .text').text();
-    //     return {
-    //         id: el.attribs['data-id'] || theaterName,
-    //         theaterName,
-    //         address: $listing('.contents .detail-text').text(),
-    //         website: $listing('.contents .details').text()
-    //     }
-    // });
-    //
-    // return theaters;
+    const {body: html} = await fetchWithDailyCache('https://goodshow.breaklegs.com/directory/')
+    const {$, $$} = parseDocument(html)
+
+    const theaters = [...$$('.listings li')].map((el) => {
+
+        const theaterName = $('.contents p.text')!.textContent;
+        return {
+            id: el.dataset.id || theaterName,
+            theaterName,
+            address: el.querySelector('.contents p.detail-text')!.textContent,
+            website: el.querySelector('.contents p.details')!.textContent
+        }
+    });
+
+    return theaters;
 }

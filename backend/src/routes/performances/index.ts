@@ -1,7 +1,7 @@
-import { getBreakLegPerformances} from "./fetchPerformances";
 import express from "express";
 import {Listing} from "./models";
-import {getNTPAPerformances} from "./fetchNTPA";
+import {getNTPAPerformances} from "../fetchNTPA";
+import {getBreakLegPerformances} from "../fetchBreaklegs";
 
 const router = express.Router();
 router.use(express.json())

@@ -1,5 +1,5 @@
-import {Listing} from "./models";
-import {fetchWithDailyCache} from "../../services/fetchHandler";
+import {Listing} from "./performances/models";
+import {fetchWithDailyCache} from "../services/fetchHandler";
 import {parse} from "date-fns";
 import {DOMParser} from "linkedom";
 

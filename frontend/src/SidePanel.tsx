@@ -35,6 +35,8 @@ export function SidePanel(props: Props) {
                                             onClick={() => selectFilter('date', idx)}>{m}</button>)}
         </div>
 
+        <div className="divider w-5/6 mx-auto"></div>
+
         <VersionInfoComponent/>
     </span>
 }

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import performanceRoute from './routes/performances'
+import venueRoute from './routes/theaters'
 
 const app = express()
 const port = process.env.ENV !== 'dev' ? 4000 : 3000;
@@ -14,6 +15,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/performances', performanceRoute);
+app.use('/venues', venueRoute);
 
 app.listen(port, '127.0.0.1', () => {
     console.log(`Example app listening on port ${port}`)

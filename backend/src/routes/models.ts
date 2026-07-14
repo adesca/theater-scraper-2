@@ -7,10 +7,3 @@ export interface Listing {
     tags: string[],
     imageUrl: string
 }
-
-export interface Venue {
-    id: string,
-    theaterName: string,
-    address: string,
-    website: string
-}

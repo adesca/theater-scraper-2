@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { parse } from 'date-fns'
 import { ticketsPage } from './ntpaFixtures'
-import { fetchWithDailyCache } from '../../services/fetchHandler'
+import { fetchWithDailyCache } from '../services/fetchHandler'
 import { getNTPAPerformances } from './fetchNTPA'
 
 // The module under test pulls its HTML from fetchWithDailyCache. We replace it
