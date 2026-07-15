@@ -1,8 +1,7 @@
 import {fetchWithDailyCache} from "../services/fetchHandler";
-import {DOMParser} from 'linkedom';
 import {parse, setYear} from "date-fns";
-import {Listing} from "./performances/models";
 import {parseDocument} from "../helper";
+import {Listing} from "../../../models";
 
 const MONTH_REGEX =
     /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i;

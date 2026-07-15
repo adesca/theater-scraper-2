@@ -1,8 +1,6 @@
 import express from "express";
-import {Listing} from "../../../../models";
-import {getNTPAPerformances} from "../fetchNTPA";
-import {getBreakLegPerformances, getBreakLegTheaters} from "../fetchBreaklegs";
-import {Venue} from "../performances/models";
+import { getBreakLegTheaters} from "../fetchBreaklegs";
+import {Venue} from "../../../../models";
 
 const router = express.Router();
 router.use(express.json())

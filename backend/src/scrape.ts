@@ -1,5 +1,5 @@
-import {getBreakLegPerformances} from "./routes/performances/fetchPerformances";
 import nodeCron from "node-cron";
+import {getBreakLegPerformances} from "./routes/fetchBreaklegs";
 
 
 nodeCron.schedule('0 0 * * *', async () => {

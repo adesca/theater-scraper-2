@@ -1,7 +1,7 @@
-import {Listing} from "./performances/models";
 import {fetchWithDailyCache} from "../services/fetchHandler";
 import {parse} from "date-fns";
 import {DOMParser} from "linkedom";
+import {Listing} from "../../../models";
 
 const domParser = new DOMParser;
 export async function getNTPAPerformances(): Promise<Listing[]> {
