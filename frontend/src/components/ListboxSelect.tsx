@@ -4,11 +4,15 @@ import {useState} from "react";
 interface Props {
     items: Array<{ label: string, value: string, group: string }>
     label: string
+    onSelect: (selectedItem: string) => void
+    selected: string | null
+
     placeholder?: string
 }
 
-export function Multiselect(props: Props) {
+export function ListboxSelect(props: Props) {
     const [activeFilter, setActiveFilter] = useState("");
+    console.log('here', props.selected)
 
     const collection = createListCollection({
         items: props.items.filter(item => item.label.toLowerCase().includes(activeFilter.toLowerCase())),
@@ -43,10 +47,10 @@ export function Multiselect(props: Props) {
                         <Listbox.ItemGroup key={group}>
                             <Listbox.ItemGroupLabel><h4>{group} ({items.length})</h4></Listbox.ItemGroupLabel>
                             {items.map((item) => (
-                                <Listbox.Item key={item.value} item={item}>
+                                <Listbox.Item key={item.value} item={item} onClick={() => props.onSelect(item.value)}>
                                     <Listbox.ItemText className={"rounded-lg border border-transparent px-3 py-1.5 text-sm" +
-                                        " hover:text-primary cursor-pointer" +
-                                        " data-[state=checked]:btn-neutral data-[state=checked]:btn"}>{item.label}</Listbox.ItemText>
+                                        " hover:text-primary cursor-pointer " +
+                                        (props.selected  === item.value ? 'btn-neutral btn' : '')}>{item.label}</Listbox.ItemText>
                                 </Listbox.Item>
                             ))}
                         </Listbox.ItemGroup>

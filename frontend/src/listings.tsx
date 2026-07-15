@@ -1,5 +1,6 @@
 import type {Filters} from "./models.ts";
 import {type Listing, useFetchListings} from "./useFetchListings.tsx";
+import {useFetchVenues} from "./sidePanel/CityFilter.tsx";
 
 interface Props {
     filters: Filters
@@ -7,7 +8,9 @@ interface Props {
 
 export function Listings(props: Props) {
     const res = useFetchListings();
-    if (res.isSuccess) {
+    const {isSuccess: isVenueFetchSuccess, data: venues} = useFetchVenues()
+
+    if (res.isSuccess && isVenueFetchSuccess) {
         const listingsToShow = res.data.listings
             .filter(l => {
                 if (props.filters.date) {
@@ -20,6 +23,13 @@ export function Listings(props: Props) {
                             // default case is when a month name is selected
                             return new Date(l.startDate).getMonth() === props.filters.date || new Date(l.endDate).getMonth() === props.filters.date
                     }
+                } else if (props.filters.city) {
+                    const venuesMatchingCompany =  venues.venues.filter(v => v.theaterName.toLowerCase().trim() === l.company.toLowerCase().trim())
+                    if (venuesMatchingCompany[0]) {
+                        return venuesMatchingCompany[0].address.toLowerCase().includes(props.filters.city.toLowerCase())
+                    } else {
+                        return false;
+                    }
                 }
 
                 return true;
@@ -30,6 +40,7 @@ export function Listings(props: Props) {
                      {listingsToShow.length} / {res.data.listings.length} show listings
                 </span>
             </div>
+
             <div className={'flex flex-wrap'}>
                 {listingsToShow.map(l => <Listing key={`${l.name}-${l.company}`} {...l} />)}
             </div>
@@ -37,30 +48,33 @@ export function Listings(props: Props) {
     } else {
         return <span>
             <div>- / -- show listings</div>
-            <div className={'flex'}>
-                <div className={'skeleton h-32 w-32'} />
-                <div className={'flex flex-col pl-2 pt-8'}>
-                    <div className={'skeleton h-4 w-64'} />
-                    <div className={'skeleton h-4 w-32 mt-4'} />
-                    <div className={'skeleton h-4 w-32 mt-4'} />
-                </div>
-            </div>
 
-            <div className={'flex'}>
-                <div className={'skeleton h-32 w-32'} />
-                <div className={'flex flex-col pl-2 pt-8'}>
-                    <div className={'skeleton h-4 w-64'} />
-                    <div className={'skeleton h-4 w-32 mt-4'} />
-                    <div className={'skeleton h-4 w-32 mt-4'} />
+            <div className={'flex flex-wrap'}>
+                <div className={'flex m-3'}>
+                    <div className={'skeleton h-32 w-32'} />
+                    <div className={'flex flex-col pl-2 pt-8'}>
+                        <div className={'skeleton h-4 w-60'} />
+                        <div className={'skeleton h-4 w-32 mt-4'} />
+                        <div className={'skeleton h-4 w-32 mt-4'} />
+                    </div>
                 </div>
-            </div>
 
-            <div className={'flex'}>
-                <div className={'skeleton h-32 w-32'} />
-                <div className={'flex flex-col pl-2 pt-8'}>
-                    <div className={'skeleton h-4 w-64'} />
-                    <div className={'skeleton h-4 w-32 mt-4'} />
-                    <div className={'skeleton h-4 w-32 mt-4'} />
+                <div className={'flex m-3'}>
+                    <div className={'skeleton h-32 w-32'} />
+                    <div className={'flex flex-col pl-2 pt-8'}>
+                        <div className={'skeleton h-4 w-60'} />
+                        <div className={'skeleton h-4 w-32 mt-4'} />
+                        <div className={'skeleton h-4 w-32 mt-4'} />
+                    </div>
+                </div>
+
+                <div className={'flex m-3'}>
+                    <div className={'skeleton h-32 w-32'} />
+                    <div className={'flex flex-col pl-2 pt-8'}>
+                        <div className={'skeleton h-4 w-60'} />
+                        <div className={'skeleton h-4 w-32 mt-4'} />
+                        <div className={'skeleton h-4 w-32 mt-4'} />
+                    </div>
                 </div>
             </div>
         </span>

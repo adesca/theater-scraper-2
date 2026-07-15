@@ -31,15 +31,19 @@ export function SidePanel(props: Props) {
         <button className={`btn btn-sm m-2 ${selectedFilter === 'ends this month' ? "btn-neutral" : "btn-outline"}`}
                 onClick={() => selectFilter('date', 'ends this month')}>Ends this month</button>
         <div>
-            {months.map((m, idx) => <button key={m} disabled={new Date().getMonth() > idx}
+            {months
+                .filter((_, idx) => new Date().getMonth() < idx)
+                .map((m, idx) => <button key={m}
                                             className={`btn btn-sm m-2  ${selectedFilter === idx ? "btn-neutral" : "btn-outline"}`}
                                             onClick={() => selectFilter('date', idx)}>{m}</button>)}
         </div>
 
         <div className="divider w-5/6 mx-auto"></div>
-        <CityFilter />
+        <CityFilter onSelect={(selectedCity) => {
+            selectFilter('city', selectedCity)
+        }} selectedCity={''+selectedFilter} />
          <div className="divider w-5/6 mx-auto"></div>
-        
+
         <VersionInfoComponent/>
     </span>
 }

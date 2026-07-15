@@ -1,5 +1,6 @@
 export interface Filters {
     date?: 'starts this month' | 'ends this month' | number
+    city?: string
 }
 
 export const months = ["January",

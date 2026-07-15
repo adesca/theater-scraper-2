@@ -1,22 +1,35 @@
 import {useQuery} from "@tanstack/react-query";
-import type { Venue } from "../../../models";
+import type {Venue} from "../../../models";
 import {useFetchListings} from "../useFetchListings.tsx";
-import {Multiselect} from "../components/Multiselect.tsx";
+import {ListboxSelect} from "../components/ListboxSelect.tsx";
 
-export function CityFilter() {
-    const {isSuccess, data} = useFetchVenues()
+interface Props {
+    onSelect: (city: string) => void
+    selectedCity: string
+}
+
+export function CityFilter(props: Props) {
+    const {isSuccess, data: venues} = useFetchVenues()
     const {isSuccess: isShowsFetched, data: shows} = useFetchListings();
 
-    if(!isSuccess || !isShowsFetched) {
+    if (!isSuccess || !isShowsFetched) {
         return <></>
     }
 
-    const allShowTheaters = shows.listings.map(l => l.company.trim().toLowerCase());
+    const allShowAddresses = shows.listings.map(l => l.company.trim().toLowerCase())
+        .map(company => venues.venues.find(v => v.theaterName.toLowerCase() === company))
+        .filter(venue => !!venue)
+        .map(v => v.address);
 
-    const multiSelectItems = Object.entries(CITIES_GROUPED).flatMap(([group, cities]) => {
-        return cities.map(c => ({label: c, value: c, group}))
-    })
-    return <Multiselect items={multiSelectItems} label={'Cities'} placeholder={"e.g. Dallas"} />
+    const multiSelectItems = Object.entries(CITIES_GROUPED)
+        .flatMap(([group, cities]) => {
+            return cities.map(c => ({label: c, value: c, group}))
+        })
+        .filter(c => {
+            return allShowAddresses.some(a => a.toLowerCase().includes(c.label.toLowerCase()))
+        })
+    return <ListboxSelect items={multiSelectItems} label={'Cities'} placeholder={"e.g. Dallas"}
+                          onSelect={props.onSelect} selected={props.selectedCity}/>
 
 }
 
@@ -31,56 +44,9 @@ export function useFetchVenues() {
     })
 }
 
-const ALL_CITIES = new Set([
-    "Richardson",
-    "Allen",
-    "Weston",
-    "Plano",
-    "Dallas",
-    "Azle",
-    "Midlothian",
-    "Bridgeport",
-    "Gainesville",
-    "Cleburne",
-    "Sulphur Springs",
-    "Duncanville",
-    "Ennis",
-    "Farmers Branch",
-    "Mansfield",
-    "Garland",
-    "Granbury",
-    "Grand Prairie",
-    "Greenville",
-    "Irving",
-    "Keller",
-    "The Colony",
-    "Lewisville",
-    "Cedar Hill",
-    "Addison",
-    "Mesquite",
-    "North Richland Hills",
-    "Bedford",
-    "Aledo",
-    "Rockwall",
-    "Grapevine",
-    "Weatherford",
-    "Sherman",
-    "Athens",
-    "Fort Worth",
-    "Pilot Point",
-    "Highland Village",
-    "Denton",
-    "Hurst",
-    "Arlington",
-    "Coppell",
-    "Frisco",
-    "Euless",
-    "Waxahachie",
-    "Wylie",
-    "Nomadic"
-])
 
 const CITIES_GROUPED = {
+    "Nomadic": ["Nomadic"],
     "North Dallas": [
         "Dallas",
         "Richardson",
