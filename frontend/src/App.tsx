@@ -1,5 +1,5 @@
 import './App.css'
-import {SidePanel} from "./SidePanel.tsx";
+import {SidePanel} from "./sidePanel/SidePanel.tsx";
 import {useState} from "react";
 import type {Filters} from "./models.ts";
 import {Listings} from "./listings.tsx";

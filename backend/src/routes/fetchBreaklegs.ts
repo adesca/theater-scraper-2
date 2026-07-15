@@ -71,7 +71,7 @@ export async function getBreakLegTheaters() {
 
     const theaters = [...$$('.listings li')].map((el) => {
 
-        const theaterName = $('.contents p.text')!.textContent;
+        const theaterName = el.querySelector('.contents p.text')!.textContent;
         return {
             id: el.dataset.id || theaterName,
             theaterName,

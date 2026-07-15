@@ -1,5 +1,5 @@
 import express from "express";
-import {Listing} from "../models";
+import {Listing} from "../../../../models";
 import {getNTPAPerformances} from "../fetchNTPA";
 import {getBreakLegPerformances, getBreakLegTheaters} from "../fetchBreaklegs";
 import {Venue} from "../performances/models";

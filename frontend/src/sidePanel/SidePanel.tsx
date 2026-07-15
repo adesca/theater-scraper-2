@@ -1,6 +1,7 @@
-import {type Filters, months} from "./models.ts";
+import {type Filters, months} from "../models.ts";
 import {useState} from "react";
 import {VersionInfoComponent} from "./VersionInfoComponent.tsx";
+import {CityFilter} from "./CityFilter.tsx";
 
 interface Props {
     onFilterChange: (input: Filters) => void;
@@ -36,7 +37,9 @@ export function SidePanel(props: Props) {
         </div>
 
         <div className="divider w-5/6 mx-auto"></div>
-
+        <CityFilter />
+         <div className="divider w-5/6 mx-auto"></div>
+        
         <VersionInfoComponent/>
     </span>
 }
