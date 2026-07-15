@@ -12,7 +12,6 @@ interface Props {
 
 export function ListboxSelect(props: Props) {
     const [activeFilter, setActiveFilter] = useState("");
-    console.log('here', props.selected)
 
     const collection = createListCollection({
         items: props.items.filter(item => item.label.toLowerCase().includes(activeFilter.toLowerCase())),
