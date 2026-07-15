@@ -33,9 +33,48 @@ const breakLegPerformancesHtml = String.raw`
 </html>
 `;
 
+// Structure (ul.listings > li > .contents > p.text/.detail-text/.details) mirrors the real
+// scraped directory page cached at backend/.cache/http/breaklegs-theaters-*.html. The two
+// theaters below are placed in different DFW cities within the same "North Dallas" region
+// (see CITIES_GROUPED in frontend/src/sidePanel/CityFilter.tsx) so e2e tests can exercise
+// region counts and city-to-city filtering.
+const breakLegTheatersHtml = String.raw`
+<!doctype html>
+<html>
+  <body>
+    <ul class="listings">
+      <li data-id="chicago-stage-company">
+        <span class="image"></span>
+        <div class="contents">
+          <p class="text">Chicago Stage Company</p>
+          <p class="detail-text">100 Main St, Dallas, TX 75201</p>
+          <p class="details"><a href="https://example.com/chicago-stage-company">https://example.com/chicago-stage-company</a></p>
+        </div>
+      </li>
+      <li data-id="lakefront-theater">
+        <span class="image"></span>
+        <div class="contents">
+          <p class="text">Lakefront Theater</p>
+          <p class="detail-text">Richardson, TX</p>
+          <p class="details"><a href="https://example.com/lakefront-theater">https://example.com/lakefront-theater</a></p>
+        </div>
+      </li>
+    </ul>
+  </body>
+</html>
+`;
+
 const server = setupServer(
   http.get('https://goodshow.breaklegs.com/performances-by-show/', () => {
     return HttpResponse.text(breakLegPerformancesHtml, {
+      headers: {
+        'content-type': 'text/html; charset=utf-8',
+      },
+    });
+  }),
+
+  http.get('https://goodshow.breaklegs.com/directory/', () => {
+    return HttpResponse.text(breakLegTheatersHtml, {
       headers: {
         'content-type': 'text/html; charset=utf-8',
       },

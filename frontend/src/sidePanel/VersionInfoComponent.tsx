@@ -18,6 +18,11 @@ export const VersionInfoComponent = () => {
                     </ul>
                 </div>
                 <div>1.1.0 - Pulls data from <a href={"https://ntpa.org/tickets"}>NTPA</a></div>
+                <div>1.2.0
+                    <ul>
+                        <li>Enables filtering by city</li>
+                    </ul>
+                </div>
                 <p className="">Press ESC key or click the button below to close</p>
                 <div className="modal-action">
                     <form method="dialog">

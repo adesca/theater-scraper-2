@@ -6,7 +6,7 @@ import { getNTPAPerformances } from './fetchNTPA'
 
 // The module under test pulls its HTML from fetchWithDailyCache. We replace it
 // with a mock so tests are fully deterministic and never hit the network.
-vi.mock('../../services/fetchHandler', () => ({
+vi.mock('../services/fetchHandler', () => ({
     fetchWithDailyCache: vi.fn(),
 }))
 
