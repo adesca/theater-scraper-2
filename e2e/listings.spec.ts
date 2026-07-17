@@ -51,3 +51,35 @@ test('switching the selected city updates which listings are shown', async ({ pa
   await expect(page.getByRole('heading', { name: 'The Glass Menagerie' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'The Play That Goes Wrong' })).toHaveCount(0);
 });
+
+test('selecting a date filter adds it to the url', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByRole('button', { name: 'Starts this month' }).click();
+
+  await expect(page).toHaveURL(/[?&]date=starts\+this\+month/);
+});
+
+test('selecting a city filter adds it to the url', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByText('Dallas', { exact: true }).click();
+
+  await expect(page).toHaveURL(/[?&]city=Dallas/);
+});
+
+test('opening a url with a prefilled date filter shows the filtered listings', async ({ page }) => {
+  await page.goto('/?date=starts+this+month');
+
+  await expect(page.getByText('13 / 16 show listings')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'The Play That Goes Wrong' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'The Glass Menagerie' })).toHaveCount(0);
+});
+
+test('opening a url with a prefilled city filter shows the filtered listings', async ({ page }) => {
+  await page.goto('/?city=Dallas');
+
+  await expect(page.getByText('1 / 16 show listings')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'The Play That Goes Wrong' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'The Glass Menagerie' })).toHaveCount(0);
+});
