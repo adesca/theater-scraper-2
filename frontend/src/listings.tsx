@@ -1,32 +1,29 @@
-import type {Filters} from "./models.ts";
 import {type Listing, useFetchListings} from "./useFetchListings.tsx";
 import {useFetchVenues} from "./sidePanel/CityFilter.tsx";
+import {useFiltersStore} from "./filtersStore.ts";
 
-interface Props {
-    filters: Filters
-}
-
-export function Listings(props: Props) {
+export function Listings() {
+    const filters = useFiltersStore(s => s.filters)
     const res = useFetchListings();
     const {isSuccess: isVenueFetchSuccess, data: venues} = useFetchVenues()
 
     if (res.isSuccess && isVenueFetchSuccess) {
         const listingsToShow = res.data.listings
             .filter(l => {
-                if (props.filters.date) {
-                    switch (props.filters.date) {
+                if (filters.date) {
+                    switch (filters.date) {
                         case "starts this month":
                             return new Date(l.startDate).getMonth() === new Date().getMonth();
                         case 'ends this month':
                             return new Date(l.endDate).getMonth() === new Date().getMonth();
                         default:
                             // default case is when a month name is selected
-                            return new Date(l.startDate).getMonth() === props.filters.date || new Date(l.endDate).getMonth() === props.filters.date
+                            return new Date(l.startDate).getMonth() === filters.date || new Date(l.endDate).getMonth() === filters.date
                     }
-                } else if (props.filters.city) {
+                } else if (filters.city) {
                     const venuesMatchingCompany =  venues.venues.filter(v => v.theaterName.toLowerCase().trim() === l.company.toLowerCase().trim())
                     if (venuesMatchingCompany[0]) {
-                        return venuesMatchingCompany[0].address.toLowerCase().includes(props.filters.city.toLowerCase())
+                        return venuesMatchingCompany[0].address.toLowerCase().includes(filters.city.toLowerCase())
                     } else {
                         return false;
                     }

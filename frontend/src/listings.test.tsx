@@ -1,7 +1,8 @@
-import {afterEach, describe, expect, it, vi} from "vitest";
+import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
 import {screen} from "@testing-library/react";
 import {Listings} from "./listings.tsx";
 import {makeListing, makeVenue, mockApi, normText, renderWithClient} from "./test/testUtils.tsx";
+import {useFiltersStore} from "./filtersStore.ts";
 
 const VENUES = [
     makeVenue({theaterName: "Dallas Rep", address: "100 Elm St, Dallas, TX 75201"}),
@@ -13,15 +14,23 @@ const LISTINGS = [
     makeListing({name: "Plano Show", company: "Plano Rep"}),
 ];
 
+beforeEach(() => {
+    window.history.replaceState(null, "", "/");
+    useFiltersStore.setState({filters: {}});
+});
+
 afterEach(() => {
     vi.unstubAllGlobals();
+    window.history.replaceState(null, "", "/");
+    useFiltersStore.setState({filters: {}});
 });
 
 describe("Listings city filter", () => {
     it("only renders listings whose venue is in the selected city", async () => {
         mockApi({venues: VENUES, listings: LISTINGS});
+        useFiltersStore.setState({filters: {city: "Dallas"}});
 
-        renderWithClient(<Listings filters={{city: "Dallas"}}/>);
+        renderWithClient(<Listings/>);
 
         // The Dallas listing is shown; the Plano listing is filtered out.
         expect(await screen.findByText("Dallas Show")).toBeTruthy();
@@ -30,8 +39,9 @@ describe("Listings city filter", () => {
 
     it("reports the shown-vs-total count for the selected city", async () => {
         mockApi({venues: VENUES, listings: LISTINGS});
+        useFiltersStore.setState({filters: {city: "Dallas"}});
 
-        const {container} = renderWithClient(<Listings filters={{city: "Dallas"}}/>);
+        const {container} = renderWithClient(<Listings/>);
 
         // Counter text ("1 / 2 show listings") is split across JSX text nodes, so match the
         // normalized textContent of the container instead of a single text node.
