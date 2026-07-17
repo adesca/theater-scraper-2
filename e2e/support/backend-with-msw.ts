@@ -28,6 +28,15 @@ const breakLegPerformancesHtml = String.raw`
           <span class="filters"><span>drama</span></span>
         </span>
       </li>
+      <li data-id="winters-tale">
+        <span class="image"></span>
+        <span class="contents">
+          <span class="text">A Winter's Tale</span>
+          <span class="detail-text">Prairie Repertory Theater</span>
+          <span class="dates">On stage January 8 - January 18</span>
+          <span class="filters"><span>drama</span></span>
+        </span>
+      </li>
     </ul>
   </body>
 </html>

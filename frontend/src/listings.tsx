@@ -10,7 +10,9 @@ export function Listings() {
     if (res.isSuccess && isVenueFetchSuccess) {
         const listingsToShow = res.data.listings
             .filter(l => {
-                if (filters.date) {
+                console.log('hit')
+                if (!isNaN(filters.date as number) || filters.date === 'ends this month' || filters.date === 'starts this month') {
+                    console.log('hi2')
                     switch (filters.date) {
                         case "starts this month":
                             return new Date(l.startDate).getMonth() === new Date().getMonth();
@@ -18,6 +20,7 @@ export function Listings() {
                             return new Date(l.endDate).getMonth() === new Date().getMonth();
                         default:
                             // default case is when a month name is selected
+                            console.log('fasd', filters.date)
                             return new Date(l.startDate).getMonth() === filters.date || new Date(l.endDate).getMonth() === filters.date
                     }
                 } else if (filters.city) {
@@ -39,7 +42,7 @@ export function Listings() {
             </div>
 
             <div className={'flex flex-wrap'}>
-                {listingsToShow.map(l => <Listing key={`${l.name}-${l.company}`} {...l} />)}
+                {listingsToShow.sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()).map(l => <Listing key={`${l.name}-${l.company}`} {...l} />)}
             </div>
         </span>
     } else {
