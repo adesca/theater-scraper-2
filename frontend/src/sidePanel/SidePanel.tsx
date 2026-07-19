@@ -1,5 +1,4 @@
 import {months} from "../models.ts";
-import {VersionInfoComponent} from "../components/VersionInfoComponent.tsx";
 import {CityFilter} from "./CityFilter.tsx";
 import {useFiltersStore} from "../filtersStore.ts";
 import {useFetchListings} from "../useFetchListings.tsx";
@@ -36,7 +35,5 @@ export function SidePanel() {
         <div className="divider w-5/6 mx-auto"></div>
         <CityFilter onSelect={(selectedCity) => selectFilter('city', selectedCity)} selectedCity={filters.city ?? ''} />
          <div className="divider w-5/6 mx-auto"></div>
-
-        <VersionInfoComponent/>
     </span>
 }

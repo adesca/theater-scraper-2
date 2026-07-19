@@ -1,12 +1,6 @@
 import {useQuery} from "@tanstack/react-query";
+import type {Listing} from "../../models";
 
-export interface Listing {
-    name: string,
-    company: string,
-    startDate: string,
-    endDate: string
-    imageUrl: string | null
-}
 
 export function useFetchListings() {
     return useQuery({

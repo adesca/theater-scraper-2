@@ -33,6 +33,9 @@ export const versionInfo: Release[] = [
     },
     {
         version: "1.2.1",
+        notes: [
+            "Clicking show titles will take you to the original listing page."
+        ],
         bugs: [
             "Fixed several issues with city filtering.",
         ],

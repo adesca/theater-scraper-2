@@ -24,7 +24,8 @@ export async function getNTPAPerformances(): Promise<Listing[]> {
                 company: `NTPA - ${linkText.split('»')[0]}`,
                 id: showDetailsLink.href,
                 tags: [],
-                imageUrl: (($listing.querySelector('a span') as HTMLSpanElement)?.style.backgroundImage.slice(4, -1) ?? "")
+                imageUrl: (($listing.querySelector('a span') as HTMLSpanElement)?.style.backgroundImage.slice(4, -1) ?? ""),
+                listingUrl: showDetailsLink.href
             }
         })
         .filter(listing => !!listing) as Listing[];

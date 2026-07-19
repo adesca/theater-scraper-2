@@ -60,6 +60,8 @@ function buildListing(opts: {
             ${datesHtml}
         </div>
         <p class="filters">${tagsHtml}</p>
+        <a class="view tpane" target="details" href="/performances/${id}/?tpane">Select "${name}"</a>
+        <a class="view" href="/performances/${id}/">Select "${name}"</a>
     </li>`
 }
 
@@ -136,6 +138,7 @@ describe('getBreakLegPerformances - field mapping', () => {
             imageUrl: 'https://static.breaklegs.app/images/audition/example/thumb.jpg',
             startDate: expectedIso('July 2'),
             endDate: expectedIso('July 11'),
+            listingUrl: 'https://goodshow.breaklegs.com/performances/no-kissing/'
         })
     })
 })

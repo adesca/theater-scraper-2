@@ -28,6 +28,7 @@ export async function getBreakLegPerformances(): Promise<Listing[]> {
             company: el.querySelector('.detail-text')?.textContent,
             id: el.attributes.getNamedItem('data-id')?.value,
             tags: [...el.querySelectorAll('.filters span')].map(el => el.textContent),
+            listingUrl: 'https://goodshow.breaklegs.com' + (el.querySelector('a.view:not(.tpane)') as HTMLAnchorElement).href,
             imageUrl
         }
 

@@ -119,6 +119,7 @@ describe('getNTPAPerformances - real fixture page', () => {
             tags: [],
             startDate: expectedIso('July 2'),
             endDate: expectedIso('July 11'),
+            listingUrl: 'https://ntpa.org/event/1776-community-theatre-plano/'
         })
     })
 

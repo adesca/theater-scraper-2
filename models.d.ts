@@ -6,6 +6,7 @@ export interface Listing {
     id: string,
     tags: string[],
     imageUrl: string
+    listingUrl: string
 }
 
 export interface Venue {
