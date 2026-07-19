@@ -2,8 +2,7 @@ import type {ReactElement} from "react";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 import {render} from "@testing-library/react";
 import {vi} from "vitest";
-import type {Venue} from "../../../models";
-import type {Listing} from "../useFetchListings.tsx";
+import type {Listing, Venue} from "../../../models";
 
 /**
  * Stub `fetch` so the react-query hooks (`useFetchListings` / `useFetchVenues`) resolve with
@@ -42,6 +41,7 @@ export function makeListing(overrides: Partial<Listing> & Pick<Listing, "name" |
         startDate: "2026-08-01",
         endDate: "2026-08-15",
         imageUrl: null,
+        listingUrl: "",
         ...overrides,
-    };
+    } as Listing;
 }
