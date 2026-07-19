@@ -90,11 +90,17 @@ test('listings render sorted by start date, earliest first (regression: unsorted
   // "A Winter's Tale" (January 8) is scraped last but starts earlier than every
   // other listing (the next-earliest, "1776", starts July 2), so it must render first.
   await expect(page.getByText('17 / 17 show listings')).toBeVisible();
-  const titles = await page.locator('.card-title').allTextContents();
 
-  expect(titles[0]).toBe("A Winter's Tale");
-  expect(titles.indexOf("A Winter's Tale")).toBeLessThan(titles.indexOf('1776'));
-  expect(titles.indexOf("A Winter's Tale")).toBeLessThan(titles.indexOf('The Play That Goes Wrong'));
+  const titles = (await page.locator('a.card-title').allTextContents())
+      .map(t => t.replace(/\s+/g, ' ').trim());
+
+  const wintersTale = titles.findIndex(t => t.includes("A Winter's Tale"));
+  const seventeen76 = titles.findIndex(t => t.includes('1776'));
+  const playThatGoesWrong = titles.findIndex(t => t.includes('The Play That Goes Wrong'));
+
+  expect(wintersTale).toBe(0);
+  expect(wintersTale).toBeLessThan(seventeen76);
+  expect(wintersTale).toBeLessThan(playThatGoesWrong);
 });
 
 test('selecting the October month filter shows only listings running that month (regression: month button used the wrong index)', async ({ page }) => {

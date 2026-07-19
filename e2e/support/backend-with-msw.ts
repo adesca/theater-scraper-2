@@ -17,6 +17,8 @@ const breakLegPerformancesHtml = String.raw`
           <span class="detail-text">Chicago Stage Company</span>
           <span class="dates">On stage July 10 - July 21</span>
           <span class="filters"><span>comedy</span></span>
+          <a class="view tpane" target="details" href="/performances/play-that-goes-wrong/?tpane">Select "play-that-goes-wrong"</a>
+          <a class="view" href="/performances/play-that-goes-wrong/">Select "play-that-goes-wrong"</a>
         </span>
       </li>
       <li data-id="glass-menagerie">
@@ -26,6 +28,8 @@ const breakLegPerformancesHtml = String.raw`
           <span class="detail-text">Lakefront Theater</span>
           <span class="dates">On stage August 2 - August 9</span>
           <span class="filters"><span>drama</span></span>
+          <a class="view tpane" target="details" href="/performances/glass-menagerie/?tpane">Select "glass-menagerie"</a>
+          <a class="view" href="/performances/glass-menagerie/">Select "A Winter's Tale"</a>
         </span>
       </li>
       <li data-id="winters-tale">
@@ -35,6 +39,8 @@ const breakLegPerformancesHtml = String.raw`
           <span class="detail-text">Prairie Repertory Theater</span>
           <span class="dates">On stage January 8 - January 18</span>
           <span class="filters"><span>drama</span></span>
+          <a class="view tpane" target="details" href="/performances/winters-tale/?tpane">Select "A Winter's Tale"</a>
+          <a class="view" href="/performances/winters-tale/">Select "A Winter's Tale"</a>
         </span>
       </li>
     </ul>
