@@ -33,7 +33,6 @@ test('selecting a city filters the main panel to only that city\'s listings', as
 
   await expect(page.getByText('17 / 17 show listings')).toBeVisible();
   await page.getByText('Dallas', { exact: true }).click();
-  await page.pause()
 
   await expect(page.getByText('1 / 17 show listings')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'The Play That Goes Wrong' })).toBeVisible();

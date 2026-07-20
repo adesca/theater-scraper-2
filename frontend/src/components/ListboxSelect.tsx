@@ -46,7 +46,20 @@ export function ListboxSelect(props: Props) {
                         <Listbox.ItemGroup key={group}>
                             <Listbox.ItemGroupLabel><h4>{group} ({items.length})</h4></Listbox.ItemGroupLabel>
                             {items.map((item) => (
-                                <Listbox.Item key={item.value} item={item} onClick={() => props.onSelect(item.value)}>
+                                <Listbox.Item key={item.value} item={item}
+                                              onMouseDown={() => {
+                                                  // The listbox focuses its content on mousedown (to keep focus off the
+                                                  // search input), which triggers the browser's default scroll-into-view
+                                                  // and can shift this item out from under the pointer before mouseup,
+                                                  // so the click lands on the container instead of the item.
+
+                                                  // // Zag Listbox focuses the content on mousedown. If that focus scrolls the page,
+                                                  // // Playwright's click can miss the item because the pointer stays at fixed viewport
+                                                  // // coordinates. This workaround avoids that issue.
+                                                  const {scrollX, scrollY} = window
+                                                  queueMicrotask(() => window.scrollTo(scrollX, scrollY))
+                                              }}
+                                              onClick={() => props.onSelect(item.value)}>
                                     <Listbox.ItemText className={"rounded-lg border border-transparent px-3 py-1.5 text-sm" +
                                         " hover:text-primary cursor-pointer " +
                                         (props.selected  === item.value ? 'btn-neutral btn' : '')}>{item.label}</Listbox.ItemText>
