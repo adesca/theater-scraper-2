@@ -138,7 +138,9 @@ describe('getBreakLegPerformances - field mapping', () => {
             imageUrl: 'https://static.breaklegs.app/images/audition/example/thumb.jpg',
             startDate: expectedIso('July 2'),
             endDate: expectedIso('July 11'),
-            listingUrl: 'https://goodshow.breaklegs.com/performances/no-kissing/'
+            listingUrl: 'https://goodshow.breaklegs.com/performances/no-kissing/',
+            source: 'breaklegs',
+            timeOfFetch: expect.stringContaining('Z')
         })
     })
 })

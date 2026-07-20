@@ -3,6 +3,8 @@ import {useFetchVenues} from "./sidePanel/CityFilter.tsx";
 import {useFiltersStore} from "./filtersStore.ts";
 import type {Listing} from "../../models";
 import {VersionInfoComponent} from "./components/VersionInfoComponent.tsx";
+import breaklegsIconUrl from './assets/breaklegs-icon.png';
+import ntpaIconUrl from './assets/ntpa-icon.png';
 
 
 export function Listings() {
@@ -96,6 +98,16 @@ function Listing(props: Listing) {
     }).format(new Date(props.endDate)) : null
     const dateStr = `${firstDate}${secondDate ? ` - ${secondDate}` : ""}`
 
+    let imgUrl = '';
+    switch (props.source) {
+        case 'breaklegs':
+            imgUrl = breaklegsIconUrl;
+            break;
+        case 'NTPA':
+            imgUrl = ntpaIconUrl;
+            break;
+    }
+
     return <div className="card card-sm card-side bg-base-300 w-96 shadow-md py-2 m-2">
         <figure className={'w-32 shrink-0'}>
             {props.imageUrl && <img className={'w-full h-auto object-contain'} src={props.imageUrl} alt={props.name}
@@ -106,7 +118,15 @@ function Listing(props: Listing) {
             <h2><a className={'card-title'} href={props.listingUrl} target={'_blank'}>{props.name} <ExternalLinkSvg /></a></h2>
             <div>{dateStr}</div>
             <p>{props.company}</p>
+            <div className={'card-actions'}>
+
+                <div className="badge badge-ghost" title={`Last pulled from ${props.source}: ${new Date(props.timeOfFetch).toLocaleString()}`} >
+                    <img src={imgUrl} className={'size-[1em]'} alt={props.source} />
+                    {props.source}
+                </div>
+            </div>
         </div>
+
     </div>
 }
 

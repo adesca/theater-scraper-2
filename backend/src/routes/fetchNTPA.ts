@@ -5,7 +5,7 @@ import {Listing} from "../../../models";
 
 const domParser = new DOMParser;
 export async function getNTPAPerformances(): Promise<Listing[]> {
-    const {body} = await fetchWithDailyCache('https://ntpa.org/tickets/')
+    const {body, cachedAt} = await fetchWithDailyCache('https://ntpa.org/tickets/')
 
     const document = domParser.parseFromString(body, 'text/html')
 
@@ -18,6 +18,7 @@ export async function getNTPAPerformances(): Promise<Listing[]> {
             const endDateText = ($listing.querySelector('.tribe-event-date-end') as HTMLSpanElement).innerText;
 
             return {
+                source: 'NTPA',
                 name: linkText.split('»')[1].split('–')[0].trim(),
                 startDate: parse(startDateText, 'MMMM d', new Date()).toISOString(),
                 endDate: parse(endDateText, 'MMMM d', new Date()).toISOString(),
@@ -25,7 +26,8 @@ export async function getNTPAPerformances(): Promise<Listing[]> {
                 id: showDetailsLink.href,
                 tags: [],
                 imageUrl: (($listing.querySelector('a span') as HTMLSpanElement)?.style.backgroundImage.slice(4, -1) ?? ""),
-                listingUrl: showDetailsLink.href
+                listingUrl: showDetailsLink.href,
+                timeOfFetch: cachedAt.toISOString()
             }
         })
         .filter(listing => !!listing) as Listing[];

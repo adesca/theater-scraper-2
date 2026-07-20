@@ -7,7 +7,7 @@ const MONTH_REGEX =
     /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i;
 
 export async function getBreakLegPerformances(): Promise<Listing[]> {
-    const {body: html} = await fetchWithDailyCache('https://goodshow.breaklegs.com/performances-by-show/')
+    const {body: html, cachedAt} = await fetchWithDailyCache('https://goodshow.breaklegs.com/performances-by-show/')
 
     const {$$} = parseDocument(html)
 
@@ -22,6 +22,7 @@ export async function getBreakLegPerformances(): Promise<Listing[]> {
         const imageUrl: string | null = image.style.backgroundImage.match(/^url\(["']?(.*?)["']?\)$/)?.[1] ?? null;
 
         const retval = {
+            source: 'breaklegs',
             name: el.querySelector('.text')?.textContent,
             startDate: startDate.toISOString(),
             endDate: endDate.toISOString(),
@@ -29,6 +30,7 @@ export async function getBreakLegPerformances(): Promise<Listing[]> {
             id: el.attributes.getNamedItem('data-id')?.value,
             tags: [...el.querySelectorAll('.filters span')].map(el => el.textContent),
             listingUrl: 'https://goodshow.breaklegs.com' + (el.querySelector('a.view:not(.tpane)') as HTMLAnchorElement).href,
+            timeOfFetch: cachedAt.toISOString(),
             imageUrl
         }
 

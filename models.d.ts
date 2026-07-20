@@ -1,4 +1,5 @@
 export interface Listing {
+    source: 'breaklegs' | 'NTPA'
     name: string,
     startDate: string,
     endDate: string,
@@ -7,6 +8,7 @@ export interface Listing {
     tags: string[],
     imageUrl: string
     listingUrl: string
+    timeOfFetch: string
 }
 
 export interface Venue {
