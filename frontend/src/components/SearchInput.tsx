@@ -5,8 +5,6 @@ interface Props {
 }
 
 export function SearchInput(props: Props) {
-    console.log('props', props)
-
     return <label className="input">
         <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
             <g
@@ -20,6 +18,6 @@ export function SearchInput(props: Props) {
                 <path d="m21 21-4.3-4.3"></path>
             </g>
         </svg>
-        <input type="search" required placeholder="Search" />
+        <input type="search" placeholder={props.label} onChange={e => props.onSearch(e.target.value)}/>
     </label>
 }

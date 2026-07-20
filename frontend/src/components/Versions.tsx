@@ -34,7 +34,9 @@ export const versionInfo: Release[] = [
     {
         version: "1.2.1",
         notes: [
-            "Clicking show titles will take you to the original listing page."
+            "Clicking show titles will take you to the original listing page.",
+            "Free text search that filters shown listings to show names and theater names",
+            "Attribution pills!"
         ],
         bugs: [
             "Fixed several issues with city filtering.",

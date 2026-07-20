@@ -6,7 +6,7 @@ export const VersionInfoComponent = () => {
     const sortedVersionInfo = versionInfo.toSorted((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }))
 
     return <>
-        <span className={'cursor-pointer'} onClick={()=> ref.current?.showModal()}>{sortedVersionInfo[0].version}</span>
+        <span className={'cursor-pointer opacity-70 hover:opacity-100 hover:underline transition-all'} title={'View changelog'} onClick={()=> ref.current?.showModal()}>{sortedVersionInfo[0].version}</span>
 
         <dialog id="my_modal_1" className="modal" ref={ref}>
             <div className="modal-box prose prose-sm">

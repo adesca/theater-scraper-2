@@ -31,7 +31,9 @@ test('shows the number of cities with listings next to the region name', async (
 test('selecting a city filters the main panel to only that city\'s listings', async ({ page }) => {
   await page.goto('/');
 
+  await expect(page.getByText('17 / 17 show listings')).toBeVisible();
   await page.getByText('Dallas', { exact: true }).click();
+  await page.pause()
 
   await expect(page.getByText('1 / 17 show listings')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'The Play That Goes Wrong' })).toBeVisible();
@@ -143,4 +145,32 @@ test('opening a url with a prefilled January (index 0) date filter shows only Ja
   await expect(page.getByText('1 / 17 show listings')).toBeVisible();
   await expect(page.getByRole('heading', { name: "A Winter's Tale" })).toBeVisible();
   await expect(page.getByRole('heading', { name: '1776' })).toHaveCount(0);
+});
+
+test('opening the version changelog shows release notes and can be closed', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByTitle('View changelog').click();
+
+  await expect(page.getByRole('heading', { name: 'Version info' })).toBeVisible();
+  await expect(page.getByText('Attribution pills!')).toBeVisible();
+  await expect(page.getByText('Fixed several issues with city filtering.')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Close' }).click();
+
+  await expect(page.getByRole('heading', { name: 'Version info' })).not.toBeVisible();
+});
+
+test('opening the version changelog does not disturb an active filter (edge case: dialog interaction leaves other state untouched)', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByRole('button', { name: 'Starts this month' }).click();
+  await expect(page.getByText('13 / 17 show listings')).toBeVisible();
+
+  await page.getByTitle('View changelog').click();
+  await expect(page.getByRole('heading', { name: 'Version info' })).toBeVisible();
+  await page.getByRole('button', { name: 'Close' }).click();
+
+  await expect(page.getByText('13 / 17 show listings')).toBeVisible();
+  await expect(page).toHaveURL(/[?&]date=starts\+this\+month/);
 });

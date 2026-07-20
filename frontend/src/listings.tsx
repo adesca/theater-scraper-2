@@ -9,11 +9,14 @@ import ntpaIconUrl from './assets/ntpa-icon.png';
 
 export function Listings() {
     const filters = useFiltersStore(s => s.filters)
+    const searchString = useFiltersStore(s => s.searchString)?.toLowerCase() ?? ""
+    console.log('searchstring', searchString)
     const res = useFetchListings();
     const {isSuccess: isVenueFetchSuccess, data: venues} = useFetchVenues()
 
     if (res.isSuccess && isVenueFetchSuccess) {
         const listingsToShow = res.data.listings
+            .filter(l => l.company.toLowerCase().includes(searchString) || l.name.toLowerCase().includes(searchString))
             .filter(l => {
                 if (!isNaN(filters.date as number) || filters.date === 'ends this month' || filters.date === 'starts this month') {
                     switch (filters.date) {
@@ -99,12 +102,15 @@ function Listing(props: Listing) {
     const dateStr = `${firstDate}${secondDate ? ` - ${secondDate}` : ""}`
 
     let imgUrl = '';
+    let badgeUrl = '';
     switch (props.source) {
         case 'breaklegs':
             imgUrl = breaklegsIconUrl;
+            badgeUrl = 'https://goodshow.breaklegs.com/'
             break;
         case 'NTPA':
             imgUrl = ntpaIconUrl;
+            badgeUrl = 'https://ntpa.org/'
             break;
     }
 
@@ -120,10 +126,10 @@ function Listing(props: Listing) {
             <p>{props.company}</p>
             <div className={'card-actions'}>
 
-                <div className="badge badge-ghost" title={`Last pulled from ${props.source}: ${new Date(props.timeOfFetch).toLocaleString()}`} >
+                <a href={badgeUrl} className="badge badge-ghost cursor-pointer" title={`Last pulled from ${props.source}: ${new Date(props.timeOfFetch).toLocaleString()}`} >
                     <img src={imgUrl} className={'size-[1em]'} alt={props.source} />
                     {props.source}
-                </div>
+                </a>
             </div>
         </div>
 

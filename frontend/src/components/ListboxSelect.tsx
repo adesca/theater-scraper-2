@@ -19,7 +19,7 @@ export function ListboxSelect(props: Props) {
     })
     return (
         <fieldset className={'prose prose-sm w-xs p-4 h-80 flex flex-col'}>
-             <legend className="fieldset-legend">{props.label}</legend>
+            <legend className="fieldset-legend">{props.label}</legend>
 
             <Listbox.Root collection={collection} className={'flex flex-col flex-1 min-h-0'}>
                 <Listbox.Label className={'input input-sm'}>
