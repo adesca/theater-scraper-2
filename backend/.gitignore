@@ -63,3 +63,9 @@ test/types/index.js
 
 # compiled app
 dist
+
+# local sqlite database
+data.db
+data.db-shm
+data.db-wal
+data.sqlite

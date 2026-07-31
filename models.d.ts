@@ -6,7 +6,7 @@ export interface Listing {
     company: string,
     id: string,
     tags: string[],
-    imageUrl: string
+    imageUrl: string | null
     listingUrl: string
     timeOfFetch: string
 }

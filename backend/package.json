@@ -10,6 +10,7 @@
     "build": "tsc",
     "dev": "ENV=dev tsx --watch src/server.ts",
     "prod": "ENV=prod node dist/server.js",
+    "scrape": "tsx src/scrape.ts --once",
     "test": "tsc -b && vitest"
   },
   "keywords": [],
@@ -19,6 +20,7 @@
     "@fastify/autoload": "^6.0.0",
     "@fastify/sensible": "^6.0.0",
     "@types/express": "^5.0.6",
+    "better-sqlite3": "^12.11.1",
     "cors": "^2.8.6",
     "date-fns": "^4.4.0",
     "drizzle-kit": "^1.0.0-rc.4",
@@ -33,6 +35,7 @@
     "vitest": "^4.1.10"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/cors": "^2.8.19",
     "@types/node": "^25.9.5",
     "c8": "^11.0.0",

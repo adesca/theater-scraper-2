@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
-import {ticketsPage} from "../../backend/src/routes/ntpaFixtures";
+import {ticketsPage} from "../../backend/src/scrapers/ntpaFixtures";
 
 const breakLegPerformancesHtml = String.raw`
 <!doctype html>
@@ -121,6 +121,16 @@ async function main() {
   process.env.THEATER_SCRAPER_CACHE_DIR = await mkdtemp(
     join(tmpdir(), 'theater-scraper-e2e-cache-'),
   );
+
+  process.env.THEATER_SCRAPER_DB_FILE = join(
+    await mkdtemp(join(tmpdir(), 'theater-scraper-e2e-db-')),
+    'e2e.db',
+  );
+
+  // The API only reads the database now, so the scrape has to run before the server
+  // starts serving -- otherwise Playwright sees an empty site.
+  const { ingestAll } = await import('../../backend/src/ingest.ts');
+  await ingestAll();
 
   await import('../../backend/src/server.ts');
 
