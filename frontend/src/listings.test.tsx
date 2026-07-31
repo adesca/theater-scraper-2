@@ -58,7 +58,7 @@ describe("Listings city filter", () => {
         // Counter text ("1 / 2 show listings") is split across JSX text nodes, so match the
         // normalized textContent of the container instead of a single text node.
         await screen.findByText("Dallas Show");
-        expect(normText(container)).toContain("1 / 2 show listings");
+        expect(normText(container)).toContain("1 Show found");
     });
 });
 
@@ -79,7 +79,7 @@ describe("Listings combined filters", () => {
         // from clicking the same two filters.
         expect(screen.queryByText("Plano August Show")).toBeNull();
 
-        expect(normText(container)).toContain("1 / 3 show listings");
+        expect(normText(container)).toContain("1 Show");
     });
 
     it("still applies a lone date filter to every venue", async () => {
@@ -92,7 +92,7 @@ describe("Listings combined filters", () => {
         expect(screen.getByText("Plano August Show")).toBeTruthy();
         expect(screen.queryByText("Dallas December Show")).toBeNull();
 
-        expect(normText(container)).toContain("2 / 3 show listings");
+        expect(normText(container)).toContain("2 Shows");
     });
 
     it("treats January as a real month rather than an absent filter", async () => {
@@ -109,7 +109,7 @@ describe("Listings combined filters", () => {
         expect(await screen.findByText("January Show")).toBeTruthy();
         expect(screen.queryByText("Dallas August Show")).toBeNull();
 
-        expect(normText(container)).toContain("1 / 4 show listings");
+        expect(normText(container)).toContain("1 Show");
     });
 });
 
@@ -127,7 +127,7 @@ describe("Listings with duplicate source ids", () => {
         const {container} = renderWithClient(<Listings/>);
 
         expect(await screen.findAllByText("Dallas Show")).toHaveLength(2);
-        expect(normText(container)).toContain("2 / 2 show listings");
+        expect(normText(container)).toContain("2 Shows");
     });
 
     it("does not warn about duplicate keys", async () => {

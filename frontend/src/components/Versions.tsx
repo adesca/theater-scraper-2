@@ -51,5 +51,11 @@ export const versionInfo: Release[] = [
             "Filters would drop silently if you had multiple active at once",
             "Tennessee wet rub was appearing twice when, really, we only need to see it once"
         ],
+    },
+    {
+        version: "1.3",
+        notes: [
+            "Adds support for a mobile view! And now the show listing count animates as it changes!"
+        ]
     }
 ];

@@ -3,7 +3,6 @@ import {useFetchVenues} from "./sidePanel/CityFilter.tsx";
 import {useFiltersStore} from "./filtersStore.ts";
 import type {Filters} from "./models.ts";
 import type {Listing, Venue} from "../../models";
-import {VersionInfoComponent} from "./components/VersionInfoComponent.tsx";
 import breaklegsIconUrl from './assets/breaklegs-icon.png';
 import ntpaIconUrl from './assets/ntpa-icon.png';
 
@@ -58,16 +57,19 @@ export function Listings() {
             .filter(l => matchesCity(l, filters.city, venues.venues))
 
         return <span>
-            <div className="flex flex-wrap items-end">
-                <span className="mr-auto">
-                     {listingsToShow.length} / {res.data.listings.length} show listings
+            <div className="flex flex-wrap">
+                <span className="">
+                    <span className="countdown pr-1">
+                      <span style={{"--value": listingsToShow.length} as React.CSSProperties } aria-live="polite" aria-label={"" +listingsToShow.length}>{listingsToShow.length} </span>
+                    </span>
+                    {listingsToShow.length === 1 ? "Show found" : "Shows found"}
                 </span>
-                <VersionInfoComponent />
+
             </div>
 
             <div className={'flex flex-wrap'}>
                 {listingsToShow
-                    .sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
                     .map(l => <Listing key={`${l.source}-${l.id}`} {...l} />)
                 }
             </div>
@@ -78,29 +80,29 @@ export function Listings() {
 
             <div className={'flex flex-wrap'}>
                 <div className={'flex m-3'}>
-                    <div className={'skeleton h-32 w-32'} />
+                    <div className={'skeleton h-32 w-32'}/>
                     <div className={'flex flex-col pl-2 pt-8'}>
-                        <div className={'skeleton h-4 w-60'} />
-                        <div className={'skeleton h-4 w-32 mt-4'} />
-                        <div className={'skeleton h-4 w-32 mt-4'} />
+                        <div className={'skeleton h-4 w-60'}/>
+                        <div className={'skeleton h-4 w-32 mt-4'}/>
+                        <div className={'skeleton h-4 w-32 mt-4'}/>
                     </div>
                 </div>
 
                 <div className={'flex m-3'}>
-                    <div className={'skeleton h-32 w-32'} />
+                    <div className={'skeleton h-32 w-32'}/>
                     <div className={'flex flex-col pl-2 pt-8'}>
-                        <div className={'skeleton h-4 w-60'} />
-                        <div className={'skeleton h-4 w-32 mt-4'} />
-                        <div className={'skeleton h-4 w-32 mt-4'} />
+                        <div className={'skeleton h-4 w-60'}/>
+                        <div className={'skeleton h-4 w-32 mt-4'}/>
+                        <div className={'skeleton h-4 w-32 mt-4'}/>
                     </div>
                 </div>
 
                 <div className={'flex m-3'}>
-                    <div className={'skeleton h-32 w-32'} />
+                    <div className={'skeleton h-32 w-32'}/>
                     <div className={'flex flex-col pl-2 pt-8'}>
-                        <div className={'skeleton h-4 w-60'} />
-                        <div className={'skeleton h-4 w-32 mt-4'} />
-                        <div className={'skeleton h-4 w-32 mt-4'} />
+                        <div className={'skeleton h-4 w-60'}/>
+                        <div className={'skeleton h-4 w-32 mt-4'}/>
+                        <div className={'skeleton h-4 w-32 mt-4'}/>
                     </div>
                 </div>
             </div>
@@ -139,13 +141,15 @@ function Listing(props: Listing) {
             />}
         </figure>
         <div className="card-body">
-            <h2><a className={'card-title'} href={props.listingUrl} target={'_blank'}>{props.name} <ExternalLinkSvg /></a></h2>
+            <h2><a className={'card-title'} href={props.listingUrl} target={'_blank'}>{props.name}
+                <ExternalLinkSvg/></a></h2>
             <div>{dateStr}</div>
             <p>{props.company}</p>
             <div className={'card-actions'}>
 
-                <a href={badgeUrl} className="badge badge-ghost cursor-pointer" title={`Last pulled from ${props.source}: ${new Date(props.timeOfFetch).toLocaleString()}`} >
-                    <img src={imgUrl} className={'size-[1em]'} alt={props.source} />
+                <a href={badgeUrl} className="badge badge-ghost cursor-pointer"
+                   title={`Last pulled from ${props.source}: ${new Date(props.timeOfFetch).toLocaleString()}`}>
+                    <img src={imgUrl} className={'size-[1em]'} alt={props.source}/>
                     {props.source}
                 </a>
             </div>
@@ -158,5 +162,12 @@ function ExternalLinkSvg() {
     return <svg className={'w-4'} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
         <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
-        <g id="SVGRepo_iconCarrier"> <g id="Interface / External_Link"> <path id="Vector" d="M10.0002 5H8.2002C7.08009 5 6.51962 5 6.0918 5.21799C5.71547 5.40973 5.40973 5.71547 5.21799 6.0918C5 6.51962 5 7.08009 5 8.2002V15.8002C5 16.9203 5 17.4801 5.21799 17.9079C5.40973 18.2842 5.71547 18.5905 6.0918 18.7822C6.5192 19 7.07899 19 8.19691 19H15.8031C16.921 19 17.48 19 17.9074 18.7822C18.2837 18.5905 18.5905 18.2839 18.7822 17.9076C19 17.4802 19 16.921 19 15.8031V14M20 9V4M20 4H15M20 4L13 11" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path> </g> </g></svg>
+        <g id="SVGRepo_iconCarrier">
+            <g id="Interface / External_Link">
+                <path id="Vector"
+                      d="M10.0002 5H8.2002C7.08009 5 6.51962 5 6.0918 5.21799C5.71547 5.40973 5.40973 5.71547 5.21799 6.0918C5 6.51962 5 7.08009 5 8.2002V15.8002C5 16.9203 5 17.4801 5.21799 17.9079C5.40973 18.2842 5.71547 18.5905 6.0918 18.7822C6.5192 19 7.07899 19 8.19691 19H15.8031C16.921 19 17.48 19 17.9074 18.7822C18.2837 18.5905 18.5905 18.2839 18.7822 17.9076C19 17.4802 19 16.921 19 15.8031V14M20 9V4M20 4H15M20 4L13 11"
+                      stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
+            </g>
+        </g>
+    </svg>
 }
