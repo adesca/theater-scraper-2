@@ -52,13 +52,42 @@ describe("filters store URL hydration", () => {
         expect(window.location.search).toBe("");
     });
 
-    it("replaces a city filter with a date filter in both store and URL", () => {
+    it("hydrates a city and a date filter together from the URL", () => {
+        window.history.replaceState(null, "", "/?city=Dallas&date=7");
+
+        const store = createFiltersStore();
+
+        expect(store.getState().filters).toEqual({city: "Dallas", date: 7});
+    });
+
+    it("keeps an existing city filter when a date filter is added", () => {
         const store = createFiltersStore();
 
         store.getState().selectFilter("city", "Dallas");
         store.getState().selectFilter("date", "starts this month");
 
-        expect(store.getState().filters).toEqual({date: "starts this month"});
-        expect(window.location.search).toBe("?date=starts+this+month");
+        expect(store.getState().filters).toEqual({city: "Dallas", date: "starts this month"});
+        expect(window.location.search).toBe("?city=Dallas&date=starts+this+month");
+    });
+
+    it("clears only the reselected criterion and leaves the rest applied", () => {
+        const store = createFiltersStore();
+
+        store.getState().selectFilter("city", "Dallas");
+        store.getState().selectFilter("date", 7);
+        store.getState().selectFilter("date", 7);
+
+        expect(store.getState().filters).toEqual({city: "Dallas"});
+        expect(window.location.search).toBe("?city=Dallas");
+    });
+
+    it("replaces the value when the same criterion is selected twice with different values", () => {
+        const store = createFiltersStore();
+
+        store.getState().selectFilter("city", "Dallas");
+        store.getState().selectFilter("city", "Plano");
+
+        expect(store.getState().filters).toEqual({city: "Plano"});
+        expect(window.location.search).toBe("?city=Plano");
     });
 });

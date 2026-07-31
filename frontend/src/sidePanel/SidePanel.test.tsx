@@ -9,9 +9,16 @@ const VENUES = [
     makeVenue({theaterName: "Dallas Rep", address: "100 Elm St, Dallas, TX 75201"}),
 ];
 
+// Mid-August so the month button under test is "August" whichever timezone getMonth() runs
+// in, and so SidePanel's renderedMonths filter keeps August in the list.
 const LISTINGS = [
-    makeListing({name: "Dallas Show", company: "Dallas Rep"}),
+    makeListing({
+        name: "Dallas Show", company: "Dallas Rep",
+        startDate: "2026-08-10", endDate: "2026-08-20",
+    }),
 ];
+
+const AUGUST = 7;
 
 beforeEach(() => {
     window.history.replaceState(null, "", "/");
@@ -24,40 +31,83 @@ afterEach(() => {
     useFiltersStore.setState({filters: {}});
 });
 
-describe("SidePanel date/city mutual exclusivity", () => {
-    it("clears the active date filter when a city is selected", async () => {
-        mockApi({venues: VENUES, listings: LISTINGS});
-        const user = userEvent.setup();
+/** Renders the panel and waits for the city list, which needs both queries to resolve. */
+async function renderPanel() {
+    mockApi({venues: VENUES, listings: LISTINGS});
 
-        renderWithClient(<SidePanel/>);
+    const user = userEvent.setup();
+    renderWithClient(<SidePanel/>);
 
-        // Select a date filter.
+    // The only city with a show, so the only item the listbox renders.
+    const dallas = await screen.findByText("Dallas");
+
+    return {user, dallas};
+}
+
+describe("SidePanel with several criteria selected", () => {
+    it("keeps a date and a city selected at the same time", async () => {
+        const {user, dallas} = await renderPanel();
+
         await user.click(screen.getByRole("button", {name: "Starts this month"}));
-        expect(useFiltersStore.getState().filters).toEqual({date: "starts this month"});
+        await user.click(dallas);
+
+        expect(useFiltersStore.getState().filters).toEqual({
+            date: "starts this month",
+            city: "Dallas",
+        });
+
+        // Both criteria also have to survive the round trip through the URL, since that is
+        // what a shared link replays.
+        expect(window.location.search).toBe("?city=Dallas&date=starts+this+month");
+    });
+
+    it("marks both the date button and the city as selected", async () => {
+        const {user, dallas} = await renderPanel();
+
+        await user.click(screen.getByRole("button", {name: "Starts this month"}));
+        await user.click(dallas);
+
+        // btn-neutral is the selected styling in both controls; btn-outline is unselected.
         expect(screen.getByRole("button", {name: "Starts this month"}).className)
             .toContain("btn-neutral");
-
-        // Selecting a city replaces the filter entirely (no date key) and deselects the date.
-        await user.click(await screen.findByText("Dallas"));
-        expect(useFiltersStore.getState().filters).toEqual({city: "Dallas"});
-        expect(screen.getByRole("button", {name: "Starts this month"}).className)
-            .not.toContain("btn-neutral");
+        expect(screen.getByText("Dallas").className).toContain("btn-neutral");
     });
 
-    it("clears the active city filter when a date is selected", async () => {
-        mockApi({venues: VENUES, listings: LISTINGS});
-        const user = userEvent.setup();
+    it("adds a month filter without dropping the selected city", async () => {
+        const {user, dallas} = await renderPanel();
 
-        renderWithClient(<SidePanel/>);
+        await user.click(dallas);
+        await user.click(screen.getByRole("button", {name: "August"}));
 
-        // Select a city filter and confirm the city item is marked selected.
-        await user.click(await screen.findByText("Dallas"));
-        expect(useFiltersStore.getState().filters).toEqual({city: "Dallas"});
-        expect(screen.getByText("Dallas").className).toContain("btn-neutral");
+        expect(useFiltersStore.getState().filters).toEqual({city: "Dallas", date: AUGUST});
+    });
 
-        // Selecting a date replaces the filter entirely (no city key) and deselects the city.
+    it("swaps one date criterion for another without touching the city", async () => {
+        const {user, dallas} = await renderPanel();
+
+        await user.click(dallas);
         await user.click(screen.getByRole("button", {name: "Starts this month"}));
-        expect(useFiltersStore.getState().filters).toEqual({date: "starts this month"});
-        expect(screen.getByText("Dallas").className).not.toContain("btn-neutral");
+        await user.click(screen.getByRole("button", {name: "Ends this month"}));
+
+        expect(useFiltersStore.getState().filters).toEqual({
+            city: "Dallas",
+            date: "ends this month",
+        });
+    });
+
+    it("deselects only the date when its button is clicked again", async () => {
+        const {user, dallas} = await renderPanel();
+
+        await user.click(screen.getByRole("button", {name: "Starts this month"}));
+        await user.click(dallas);
+        await user.click(screen.getByRole("button", {name: "Starts this month"}));
+
+        expect(useFiltersStore.getState().filters).toEqual({city: "Dallas"});
+        expect(window.location.search).toBe("?city=Dallas");
+
+        expect(screen.getByRole("button", {name: "Starts this month"}).className)
+            .toContain("btn-outline");
+        expect(screen.getByText("Dallas").className).toContain("btn-neutral");
     });
 });
+

@@ -41,5 +41,15 @@ export const versionInfo: Release[] = [
         bugs: [
             "Fixed several issues with city filtering.",
         ],
+    },
+    {
+        version: "1.2.2",
+        notes: [
+            "Special backend work, shhh"
+        ],
+        bugs: [
+            "Filters would drop silently if you had multiple active at once",
+            "Tennessee wet rub was appearing twice when, really, we only need to see it once"
+        ],
     }
 ];

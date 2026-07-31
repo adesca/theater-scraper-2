@@ -56,11 +56,18 @@ export function createFiltersStore() {
                 filters: {},
                 searchString: "",
                 selectFilter: (filterType, value) => {
-                    if (get().filters[filterType] === value) {
-                        set({filters: {}})
+                    const current = get().filters
+
+                    // Reselecting the active value clears that one criterion and leaves the
+                    // rest in place, so filters accumulate the same way a shared link does.
+                    if (current[filterType] === value) {
+                        const remaining = {...current}
+                        delete remaining[filterType]
+                        set({filters: remaining})
                         return
                     }
-                    set({filters: {[filterType]: value} as Filters})
+
+                    set({filters: {...current, [filterType]: value}})
                 },
                 searchFilter: (searchInput: string) => {
                     set({searchString: searchInput})
