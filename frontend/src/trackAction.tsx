@@ -27,7 +27,6 @@ export function trackAction() {
                 action, properties,
                 trackingId: getTrackingId(),
                 screenWidth: window.innerWidth,
-                isMobile: window.innerWidth < 1024,
                 version: versionInfo[0].version
             }),
             keepalive: true

@@ -83,8 +83,9 @@ export function createFiltersStore() {
                     clearTimeout(searchAnalyticsTimeout);
 
                     searchAnalyticsTimeout = setTimeout(() => {
-                        track("search", {
-                            query: searchInput,
+                        track("filter-applied", {
+                            type: 'search-by-text',
+                            value: searchInput,
                         });
                     }, 750);
                 },

@@ -63,3 +63,16 @@ export const listings = sqliteTable("listings", {
     index("listings_show_idx").on(table.showId),
     index("listings_venue_idx").on(table.venueId),
 ]);
+
+export const analyticsEvents = sqliteTable("analytics_events", {
+    id: integer().primaryKey({ autoIncrement: true }),
+    createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),
+    action: text().notNull(),
+    trackingId: text("tracking_id").notNull(),
+    screenWidth: integer("screen_width").notNull(),
+    version: text().notNull(),
+    // JSON blob containing event specific properties
+    properties: text()
+}, (table) => [
+    index("analytics_action_created_idx").on(table.action, table.createdAt)
+]);

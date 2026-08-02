@@ -52,6 +52,22 @@ CREATE INDEX IF NOT EXISTS listings_start_date_idx ON listings (startDate);
 CREATE INDEX IF NOT EXISTS listings_end_date_idx ON listings (endDate);
 CREATE INDEX IF NOT EXISTS listings_show_idx ON listings (showId);
 CREATE INDEX IF NOT EXISTS listings_venue_idx ON listings (venueId);
+
+CREATE TABLE IF NOT EXISTS analytics_events (
+                                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+                                                action TEXT NOT NULL,
+
+                                                tracking_id TEXT NOT NULL,
+
+                                                screen_width INTEGER NOT NULL,
+                                                version TEXT NOT NULL,
+
+                                                properties TEXT
+);
+CREATE INDEX IF NOT EXISTS analytics_action_created_idx ON analytics_events(action, created_at);
+
 `;
 
 let db: ReturnType<typeof drizzle> | undefined;
