@@ -7,6 +7,8 @@ import type {Filters} from "./models.ts";
 
 const HALF_DAY = 1000 * 60 * 60 * 12;
 
+const EMPTY_LISTINGS: Listing[] = [];
+
 export function useFetchListings() {
     const track = trackAction();
 
@@ -15,15 +17,25 @@ export function useFetchListings() {
         staleTime: HALF_DAY, gcTime: HALF_DAY * 2,
         refetchOnWindowFocus: false,
         queryFn: async () => {
+            // A dead backend rejects rather than resolving, so the network case is
+            // reported separately from a server that answered with an error status.
             const response = await fetch(
                 `${import.meta.env.VITE_API_URL}/performances`
-            );
+            ).catch((error: unknown) => {
+                track("performances-load-failed", {reason: "network"});
+                throw error;
+            });
+
+            if (!response.ok) {
+                track("performances-load-failed", {reason: "http", status: response.status});
+                throw new Error(`/performances responded ${response.status}`);
+            }
 
             const data = await response.json() as {
                 listings: Listing[];
             };
 
-            track("performances_loaded", {
+            track("performances-loaded", {
                 count: data.listings.length,
             });
 
@@ -72,17 +84,20 @@ export function useFetchFilteredListings() {
     const filters = useFiltersStore(s => s.filters)
     const searchString = useFiltersStore(s => s.searchString)?.toLowerCase() ?? ""
 
-    if (isListingsFetchSuccess && isVenueFetchSuccess) {
-        // Each criterion is applied independently, so a link carrying both ?city= and ?date=
-        // narrows by both instead of silently ignoring one of them.
-        const listingsToShow = data.listings
-            .filter(l => matchesSearch(l, searchString))
-            .filter(l => matchesDate(l, filters.date))
-            .filter(l => matchesCity(l, filters.city, venues.venues))
+    const activeFilters = {searchString, date: filters.date, city: filters.city}
 
-        return {status: 'success', listingsToShow, filters: {searchString, date: filters.date, city: filters.city}} as const
+    // Both branches carry the same keys, so callers can read listingsToShow and filters
+    // without narrowing on status first.
+    if (!isListingsFetchSuccess || !isVenueFetchSuccess) {
+        return {status: 'pending', listingsToShow: EMPTY_LISTINGS, filters: activeFilters} as const
     }
 
-    return {status: 'pending'} as const
+    // Each criterion is applied independently, so a link carrying both ?city= and ?date=
+    // narrows by both instead of silently ignoring one of them.
+    const listingsToShow = data.listings
+        .filter(l => matchesSearch(l, searchString))
+        .filter(l => matchesDate(l, filters.date))
+        .filter(l => matchesCity(l, filters.city, venues.venues))
 
+    return {status: 'success', listingsToShow, filters: activeFilters} as const
 }

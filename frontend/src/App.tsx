@@ -4,10 +4,12 @@ import {Listings} from "./listings.tsx";
 import {Bomb, CircleX, Funnel} from "lucide-react";
 import {useFiltersStore} from "./filtersStore.ts";
 import {months} from "./models.ts";
-import {useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {trackAction} from "./trackAction.tsx";
 
 function App() {
+    usePageView();
+
     return <div className="drawer lg:drawer-open">
         <input id="drawer-toggle" type="checkbox" className="drawer-toggle"/>
         <div className="drawer-content flex flex-col">
@@ -25,6 +27,23 @@ function App() {
             </aside>
         </div>
     </div>
+}
+
+function usePageView() {
+    const track = trackAction();
+    // StrictMode runs effects twice in dev, and the ref survives that remount, so a
+    // visit is only ever counted once.
+    const tracked = useRef(false);
+
+    useEffect(() => {
+        if (tracked.current) return;
+        tracked.current = true;
+
+        track('page-view', {
+            referrer: document.referrer || null,
+            queryString: window.location.search,
+        });
+    }, []);
 }
 
 function SelectedFilterPills() {

@@ -9,11 +9,15 @@ export function Listings() {
     const track = trackAction()
     const {status, listingsToShow, filters} = useFetchFilteredListings();
 
+    // Keyed on the filter values, not just the result count: going from one empty result
+    // set straight to another leaves the count at 0, and each dead end is worth reporting.
+    const filterSignature = JSON.stringify(filters);
+
     useEffect(() => {
         if (status === "success" && listingsToShow.length === 0) {
-            track("no_results", {filters});
+            track("no-results", {filters});
         }
-    }, [status, listingsToShow?.length]);
+    }, [status, listingsToShow.length, filterSignature]);
 
     if (status === 'success') {
         return <span>
@@ -71,6 +75,8 @@ export function Listings() {
 }
 
 function Listing(props: Listing) {
+    const track = trackAction();
+
     const firstDate = new Intl.DateTimeFormat(undefined, {
         month: "long",
         day: "numeric"
@@ -101,13 +107,22 @@ function Listing(props: Listing) {
             />}
         </figure>
         <div className="card-body">
-            <h2><a className={'card-title'} href={props.listingUrl} target={'_blank'}>{props.name}
+            <h2><a className={'card-title'} href={props.listingUrl} target={'_blank'}
+                   onClick={() => track('listing-clicked', {
+                       name: props.name,
+                       company: props.company,
+                       source: props.source
+                   })}>{props.name}
                 <ExternalLinkSvg/></a></h2>
             <div>{dateStr}</div>
             <p>{props.company}</p>
             <div className={'card-actions'}>
 
                 <a href={badgeUrl} className="badge badge-ghost cursor-pointer"
+                   onClick={() => track('listing-source-clicked', {
+                       source: props.source,
+                       company: props.company
+                   })}
                    title={`Last pulled from ${props.source}: ${new Date(props.timeOfFetch).toLocaleString()}`}>
                     <img src={imgUrl} className={'size-[1em]'} alt={props.source}/>
                     {props.source}

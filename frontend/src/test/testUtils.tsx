@@ -13,7 +13,7 @@ export function mockApi(data: { listings?: Listing[]; venues?: Venue[] }) {
         const body = url.includes("/venues")
             ? {venues: data.venues ?? []}
             : {listings: data.listings ?? []};
-        return Promise.resolve({json: () => Promise.resolve(body)});
+        return Promise.resolve({ok: true, status: 200, json: () => Promise.resolve(body)});
     }));
 }
 

@@ -4,11 +4,8 @@ import {useFiltersStore} from "../filtersStore.ts";
 import {useFetchListings} from "../useFetchListings.tsx";
 import {SearchInput} from "../components/SearchInput.tsx";
 import {VersionInfoComponent} from "../components/VersionInfoComponent.tsx";
-import {trackAction} from "../trackAction.tsx";
 
 export function SidePanel() {
-    const track = trackAction();
-
     const filters = useFiltersStore(s => s.filters)
     const searchString = useFiltersStore(s => s.searchString) ?? ""
     const selectFilter = useFiltersStore(s => s.selectFilter)
@@ -32,10 +29,7 @@ export function SidePanel() {
     return <span className={'prose'}>
         <div className={'flex flex-row items-center'}>
             <h2 className={'mr-auto'}>Filters</h2>
-            <button className={'btn btn-sm btn-outline'} onClick={() => {
-                track("clear-all-filters")
-                clearFilters()
-            }} disabled={!hasFilters}>
+            <button className={'btn btn-sm btn-outline'} onClick={clearFilters} disabled={!hasFilters}>
                 Clear all
             </button>
         </div>
