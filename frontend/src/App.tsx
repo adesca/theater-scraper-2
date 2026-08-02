@@ -1,7 +1,7 @@
 import './App.css'
 import {SidePanel} from "./sidePanel/SidePanel.tsx";
 import {Listings} from "./listings.tsx";
-import {Bomb, CircleX, Menu} from "lucide-react";
+import {Bomb, CircleX, Funnel} from "lucide-react";
 import {useFiltersStore} from "./filtersStore.ts";
 import {months} from "./models.ts";
 import {useState} from "react";
@@ -50,17 +50,17 @@ function SelectedFilterPills() {
 
     const hasFilters = !!(filters.date || filters.city || searchString)
 
-    return <div className={'flex flex-row mx-2 justify-between items-center lg:hidden'}>
-        <label htmlFor="drawer-toggle" className="btn drawer-button lg:hidden self-start m-2">
-            <Menu/>
-        </label>
-        <div className={'[&>*]:my-1 [&>*]:mx-1'}>
+    return <div className={'flex flex-row mx-2 justify-between items-start lg:hidden'}>
+        <div className={'[&>*]:my-1 [&>*]:mx-1 flex-1'}>
             {DatePill}
             {CityPill}
             {SearchStringPill}
 
             {hasFilters && <div onClick={clearFilters} className="badge badge-ghost badge-lg cursor-pointer">Clear filters <Bomb /></div>}
         </div>
+        <label htmlFor="drawer-toggle" className="btn drawer-button lg:hidden shrink-0 m-2">
+            <Funnel />
+        </label>
     </div>
 }
 

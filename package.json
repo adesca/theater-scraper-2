@@ -1,6 +1,7 @@
 {
   "scripts": {
     "test:e2e": "playwright test",
+    "test:e2e:local": "playwright test --ui",
     "test:smoke": "playwright test --config=playwright.smoke.config.ts",
     "dev": "concurrently --kill-others-on-fail 'npm run dev:backend' 'npm run dev:frontend'",
     "dev:backend": "npm --prefix ./backend run dev",

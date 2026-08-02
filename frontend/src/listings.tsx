@@ -76,7 +76,7 @@ export function Listings() {
         </span>
     } else {
         return <span>
-            <div>- / -- show listings</div>
+            <div>-- Shows found</div>
 
             <div className={'flex flex-wrap'}>
                 <div className={'flex m-3'}>

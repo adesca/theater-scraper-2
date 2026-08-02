@@ -3,6 +3,7 @@ import {CityFilter} from "./CityFilter.tsx";
 import {useFiltersStore} from "../filtersStore.ts";
 import {useFetchListings} from "../useFetchListings.tsx";
 import {SearchInput} from "../components/SearchInput.tsx";
+import {VersionInfoComponent} from "../components/VersionInfoComponent.tsx";
 
 export function SidePanel() {
     const filters = useFiltersStore(s => s.filters)
@@ -56,5 +57,6 @@ export function SidePanel() {
         <div className="divider w-5/6 mx-auto"></div>
         <CityFilter onSelect={(selectedCity) => selectFilter('city', selectedCity)} selectedCity={filters.city ?? ''} />
         <div className="divider w-5/6 mx-auto"></div>
+        <VersionInfoComponent />
     </span>
 }

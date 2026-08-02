@@ -5,6 +5,27 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import {ticketsPage} from "../../backend/src/scrapers/ntpaFixtures";
 
+const format = date =>
+    date.toLocaleDateString("en-US", { month: "long", day: "numeric" });
+
+const today = new Date();
+
+const todayStr = format(today);
+
+const todayPlus10 = new Date(today);
+todayPlus10.setDate(todayPlus10.getDate() + 10);
+
+const todayPlus1Month = new Date(today);
+todayPlus1Month.setMonth(todayPlus1Month.getMonth() + 1);
+
+const todayPlus1MonthPlus7Days = new Date(today);
+todayPlus1MonthPlus7Days.setMonth(todayPlus1MonthPlus7Days.getMonth() + 1);
+todayPlus1MonthPlus7Days.setDate(todayPlus1MonthPlus7Days.getDate() + 7);
+
+const todayPlus10Str = format(todayPlus10);
+const todayPlus1MonthStr = format(todayPlus1Month);
+const todayPlus1MonthPlus7DaysStr = format(todayPlus1MonthPlus7Days);
+
 const breakLegPerformancesHtml = String.raw`
 <!doctype html>
 <html>
@@ -15,7 +36,7 @@ const breakLegPerformancesHtml = String.raw`
         <span class="contents">
           <span class="text">The Play That Goes Wrong</span>
           <span class="detail-text">Chicago Stage Company</span>
-          <span class="dates">On stage July 10 - July 21</span>
+          <span class="dates">On stage ${todayStr} - ${todayPlus10Str}</span>
           <span class="filters"><span>comedy</span></span>
           <a class="view tpane" target="details" href="/performances/play-that-goes-wrong/?tpane">Select "play-that-goes-wrong"</a>
           <a class="view" href="/performances/play-that-goes-wrong/">Select "play-that-goes-wrong"</a>
@@ -26,7 +47,7 @@ const breakLegPerformancesHtml = String.raw`
         <span class="contents">
           <span class="text">The Glass Menagerie</span>
           <span class="detail-text">Lakefront Theater</span>
-          <span class="dates">On stage August 2 - August 9</span>
+          <span class="dates">On stage ${todayPlus1MonthStr} - ${todayPlus1MonthPlus7DaysStr}</span>
           <span class="filters"><span>drama</span></span>
           <a class="view tpane" target="details" href="/performances/glass-menagerie/?tpane">Select "glass-menagerie"</a>
           <a class="view" href="/performances/glass-menagerie/">Select "A Winter's Tale"</a>
