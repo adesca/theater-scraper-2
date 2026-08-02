@@ -42,6 +42,28 @@ describe("App loads pre-filtered from a shared URL", () => {
     });
 });
 
+describe("Clearing every filter from the pill row", () => {
+    it("drops all criteria and restores the unfiltered list", async () => {
+        mockApi({venues: VENUES, listings: LISTINGS});
+        const user = userEvent.setup();
+
+        // Set before rendering so the first paint is already filtered, as a shared link is.
+        useFiltersStore.setState({filters: {city: "Dallas"}, searchString: "dallas"});
+
+        renderWithClient(<App/>);
+
+        expect(await screen.findByText("Dallas Show")).toBeTruthy();
+        expect(screen.queryByText("Plano Show")).toBeNull();
+
+        await user.click(screen.getByText("Clear filters"));
+
+        expect(await screen.findByText("Plano Show")).toBeTruthy();
+        expect(useFiltersStore.getState().filters).toEqual({});
+        expect(useFiltersStore.getState().searchString).toBe("");
+        expect(window.location.search).toBe("");
+    });
+});
+
 describe("Search filters listings by title or company", () => {
     const SEARCH_LISTINGS = [
         makeListing({name: "The Rocky Horror Show", company: "Plano Rep"}),

@@ -31,6 +31,7 @@ function SelectedFilterPills() {
     const searchString = useFiltersStore(s => s.searchString)?.toLowerCase() ?? ""
     const selectFilter = useFiltersStore(s => s.selectFilter)
     const filterByString = useFiltersStore(s => s.searchFilter)
+    const clearFilters = useFiltersStore(s => s.clearFilters)
 
 
     let DatePill = <></>
@@ -48,22 +49,8 @@ function SelectedFilterPills() {
     const SearchStringPill = searchString ? <FilterPill text={searchString} onClose={() => filterByString("")} /> : <></>
 
     const hasFilters = !!(filters.date || filters.city || searchString)
-    function clearAllFilters() {
-        if (filters.date) {
-            selectFilter('date', filters.date)
-        }
 
-        if (filters.city) {
-            selectFilter('city', filters.city)
-        }
-
-        if (searchString) {
-            filterByString("")
-        }
-    }
-
-    console.log('filters', filters)
-    return <div className={'flex flex-row mx-2 justify-between items-center'}>
+    return <div className={'flex flex-row mx-2 justify-between items-center lg:hidden'}>
         <label htmlFor="drawer-toggle" className="btn drawer-button lg:hidden self-start m-2">
             <Menu/>
         </label>
@@ -72,7 +59,7 @@ function SelectedFilterPills() {
             {CityPill}
             {SearchStringPill}
 
-            {hasFilters && <div onClick={clearAllFilters} className="badge badge-ghost badge-lg cursor-pointer">Clear filters <Bomb /></div>}
+            {hasFilters && <div onClick={clearFilters} className="badge badge-ghost badge-lg cursor-pointer">Clear filters <Bomb /></div>}
         </div>
     </div>
 }

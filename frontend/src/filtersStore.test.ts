@@ -81,6 +81,30 @@ describe("filters store URL hydration", () => {
         expect(window.location.search).toBe("?city=Dallas");
     });
 
+    it("clears every criterion, the search string and the URL in one call", () => {
+        const store = createFiltersStore();
+
+        store.getState().selectFilter("city", "Dallas");
+        store.getState().selectFilter("date", 7);
+        store.getState().searchFilter("rocky");
+
+        store.getState().clearFilters();
+
+        expect(store.getState().filters).toEqual({});
+        expect(store.getState().searchString).toBe("");
+        expect(window.location.search).toBe("");
+    });
+
+    it("leaves an already-empty store untouched when clearing", () => {
+        const store = createFiltersStore();
+
+        store.getState().clearFilters();
+
+        expect(store.getState().filters).toEqual({});
+        expect(store.getState().searchString).toBe("");
+        expect(window.location.search).toBe("");
+    });
+
     it("replaces the value when the same criterion is selected twice with different values", () => {
         const store = createFiltersStore();
 

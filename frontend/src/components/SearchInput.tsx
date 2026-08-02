@@ -1,6 +1,8 @@
 
 interface Props {
     label: string
+    /** Controlled, so clearing the search in the store also empties the box. */
+    value: string
     onSearch: (searchText: string) => void
 }
 
@@ -18,6 +20,7 @@ export function SearchInput(props: Props) {
                 <path d="m21 21-4.3-4.3"></path>
             </g>
         </svg>
-        <input type="search" placeholder={props.label} onChange={e => props.onSearch(e.target.value)}/>
+        <input type="search" placeholder={props.label} value={props.value}
+               onChange={e => props.onSearch(e.target.value)}/>
     </label>
 }

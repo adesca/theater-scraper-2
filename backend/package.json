@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsx src/scrape.ts --once && tsc",
     "dev": "ENV=dev tsx --watch src/server.ts",
     "prod": "ENV=prod node dist/server.js",
     "scrape": "tsx src/scrape.ts --once",

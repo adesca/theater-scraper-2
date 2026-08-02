@@ -7,6 +7,7 @@ interface FiltersState {
     searchString: string
     selectFilter: <T extends keyof Filters>(filterType: NonNullable<T>, value: NonNullable<Filters[T]>) => void
     searchFilter: (value: string) => void
+    clearFilters: () => void
 }
 
 const FILTER_PARAM_KEYS = ["date", "city", 'searchString'] as const
@@ -71,6 +72,11 @@ export function createFiltersStore() {
                 },
                 searchFilter: (searchInput: string) => {
                     set({searchString: searchInput})
+                },
+                clearFilters: () => {
+                    // One write, so persist empties every URL param in a single replaceState
+                    // rather than the caller toggling criteria off one at a time.
+                    set({filters: {}, searchString: ""})
                 }
             }),
             {

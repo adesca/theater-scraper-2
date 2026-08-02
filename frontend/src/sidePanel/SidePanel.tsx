@@ -6,8 +6,14 @@ import {SearchInput} from "../components/SearchInput.tsx";
 
 export function SidePanel() {
     const filters = useFiltersStore(s => s.filters)
+    const searchString = useFiltersStore(s => s.searchString) ?? ""
     const selectFilter = useFiltersStore(s => s.selectFilter)
     const filterByString = useFiltersStore(s => s.searchFilter)
+    const clearFilters = useFiltersStore(s => s.clearFilters)
+
+    // Compared against undefined rather than tested for truthiness, so a January filter
+    // (month index 0) still counts as a filter.
+    const hasFilters = filters.date !== undefined || filters.city !== undefined || searchString !== ""
 
     const {isSuccess: isShowsFetched, data: shows} = useFetchListings();
     let renderedMonths = [...months];
@@ -20,10 +26,15 @@ export function SidePanel() {
 
 
     return <span className={'prose'}>
-        <h2 className={'mr-auto'}>Filters</h2>
+        <div className={'flex flex-row items-center'}>
+            <h2 className={'mr-auto'}>Filters</h2>
+            <button className={'btn btn-sm btn-outline'} onClick={clearFilters} disabled={!hasFilters}>
+                Clear all
+            </button>
+        </div>
 
         <div className={'p-4'}>
-            <SearchInput label={"Show titles / theatres"} onSearch={filterByString} />
+            <SearchInput label={"Show titles / theatres"} value={searchString} onSearch={filterByString} />
         </div>
 
         <div className="divider w-5/6 mx-auto"></div>
