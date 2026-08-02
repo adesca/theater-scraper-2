@@ -1,4 +1,3 @@
-
 interface Props {
     label: string
     /** Controlled, so clearing the search in the store also empties the box. */

@@ -1,6 +1,7 @@
 import {create} from "zustand";
 import {createJSONStorage, persist, type StateStorage} from "zustand/middleware";
-import type {Filters} from "./models.ts";
+import {type Filters} from "./models.ts";
+import {trackAction} from "./trackAction.tsx";
 
 interface FiltersState {
     filters: Filters
@@ -50,6 +51,9 @@ export const urlStorage: StateStorage = {
     },
 }
 
+const track = trackAction();
+let searchAnalyticsTimeout: ReturnType<typeof setTimeout> | undefined;
+
 export function createFiltersStore() {
     return create<FiltersState>()(
         persist(
@@ -62,18 +66,30 @@ export function createFiltersStore() {
                     // Reselecting the active value clears that one criterion and leaves the
                     // rest in place, so filters accumulate the same way a shared link does.
                     if (current[filterType] === value) {
+                        track('filter-removed', {type: filterType, value: value})
                         const remaining = {...current}
                         delete remaining[filterType]
                         set({filters: remaining})
                         return
                     }
 
+                    track('filter-applied', {type: filterType, value: value})
+
                     set({filters: {...current, [filterType]: value}})
                 },
                 searchFilter: (searchInput: string) => {
                     set({searchString: searchInput})
+
+                    clearTimeout(searchAnalyticsTimeout);
+
+                    searchAnalyticsTimeout = setTimeout(() => {
+                        track("search", {
+                            query: searchInput,
+                        });
+                    }, 750);
                 },
                 clearFilters: () => {
+                    track('filter-removed', {type: 'all'})
                     // One write, so persist empties every URL param in a single replaceState
                     // rather than the caller toggling criteria off one at a time.
                     set({filters: {}, searchString: ""})

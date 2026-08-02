@@ -9,6 +9,7 @@ const port = process.env.ENV !== 'dev' ? 4000 : 3000;
 
 const corsOpts = process.env.ENV !== 'dev' ? {origin: 'https://theater.adesca.dev'} : undefined
 app.use(cors(corsOpts))
+app.use(express.json())
 
 app.get('/', (req, res) => {
     res.send('Hello World!')
@@ -16,6 +17,11 @@ app.get('/', (req, res) => {
 
 app.use('/performances', performanceRoute);
 app.use('/venues', venueRoute);
+app.post('/analytics', (req, res) => {
+    console.log(req.body);
+
+    res.status(204).send()
+})
 
 app.listen(port, '127.0.0.1', () => {
     console.log(`Example app listening on port ${port}`)

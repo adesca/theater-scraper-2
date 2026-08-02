@@ -58,4 +58,5 @@ export const versionInfo: Release[] = [
             "Adds support for a mobile view! And now the show listing count animates as it changes!"
         ]
     }
-];
+]
+    .toSorted((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));

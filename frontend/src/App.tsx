@@ -5,6 +5,7 @@ import {Bomb, CircleX, Funnel} from "lucide-react";
 import {useFiltersStore} from "./filtersStore.ts";
 import {months} from "./models.ts";
 import {useState} from "react";
+import {trackAction} from "./trackAction.tsx";
 
 function App() {
     return <div className="drawer lg:drawer-open">
@@ -27,6 +28,8 @@ function App() {
 }
 
 function SelectedFilterPills() {
+    const track = trackAction();
+
     const filters = useFiltersStore(s => s.filters);
     const searchString = useFiltersStore(s => s.searchString)?.toLowerCase() ?? ""
     const selectFilter = useFiltersStore(s => s.selectFilter)
@@ -58,7 +61,8 @@ function SelectedFilterPills() {
 
             {hasFilters && <div onClick={clearFilters} className="badge badge-ghost badge-lg cursor-pointer">Clear filters <Bomb /></div>}
         </div>
-        <label htmlFor="drawer-toggle" aria-label="Open filters" className="btn drawer-button lg:hidden shrink-0 m-2">
+        <label htmlFor="drawer-toggle" aria-label="Open filters" className="btn drawer-button lg:hidden shrink-0 m-2"
+               onClick={() => track('filter-drawer-opened')} >
             <Funnel />
         </label>
     </div>

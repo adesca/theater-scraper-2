@@ -1,19 +1,26 @@
 import {useRef} from "react";
 import {versionInfo} from "./Versions.tsx";
+import {trackAction} from "../trackAction.tsx";
 
 export const VersionInfoComponent = () => {
     const ref = useRef<HTMLDialogElement>(null);
-    const sortedVersionInfo = versionInfo.toSorted((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }))
+    const track = trackAction();
 
     return <>
-        <span className={'cursor-pointer opacity-70 hover:opacity-100 hover:underline transition-all'} title={'View changelog'} onClick={()=> ref.current?.showModal()}>v{sortedVersionInfo[0].version}</span>
+        <span className={'cursor-pointer opacity-70 hover:opacity-100 hover:underline transition-all'} title={'View changelog'}
+              onClick={()=> {
+                  track('changelog-dialog-opened')
+                  ref.current?.showModal()
+              }
+        }
+        >v{versionInfo[0].version}</span>
 
         <dialog id="my_modal_1" className="modal" ref={ref}>
             <div className="modal-box prose prose-sm">
                 <h3>Version info</h3>
 
                 <div className="max-h-[60vh] overflow-y-auto pr-2">
-                    {sortedVersionInfo
+                    {versionInfo
                         .map(({ version, notes, bugs }) => (
                             <section key={version} className="mb-8">
                                 <h3 className="text-lg font-bold">{version}</h3>
