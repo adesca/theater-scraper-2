@@ -5,8 +5,6 @@ import {useFetchVenues} from "./sidePanel/CityFilter.tsx";
 import {useFiltersStore} from "./filtersStore.ts";
 import type {Filters} from "./models.ts";
 
-const HALF_DAY = 1000 * 60 * 60 * 12;
-
 const EMPTY_LISTINGS: Listing[] = [];
 
 export function useFetchListings() {
@@ -14,8 +12,6 @@ export function useFetchListings() {
 
     return useQuery({
         queryKey: ['listings'],
-        staleTime: HALF_DAY, gcTime: HALF_DAY * 2,
-        refetchOnWindowFocus: false,
         queryFn: async () => {
             // A dead backend rejects rather than resolving, so the network case is
             // reported separately from a server that answered with an error status.

@@ -1,8 +1,6 @@
 import express from "express";
-import { asc } from "drizzle-orm";
-import { getDB } from "../../db/client";
-import {analyticsEvents, venues} from "../../db/schema";
-import { Venue } from "../../../../models";
+import {getDB} from "../../db/client";
+import {analyticsEvents} from "../../db/schema";
 
 const router = express.Router();
 router.use(express.json())
@@ -13,7 +11,6 @@ router.post('', async (req, res) => {
     ...req.body,
     properties: JSON.stringify(req.body.properties)
   }).returning()
-  console.log('analytics event inserted', insertedEvent)
 
   res.status(204).send()
 })
