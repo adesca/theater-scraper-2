@@ -50,7 +50,7 @@ function SelectedFilterPills() {
 
     const hasFilters = !!(filters.date || filters.city || searchString)
 
-    return <div className={'flex flex-row mx-2 justify-between items-start lg:hidden'}>
+    return <div data-testid={'active-filter-pills'} className={'flex flex-row mx-2 justify-between items-start lg:hidden'}>
         <div className={'[&>*]:my-1 [&>*]:mx-1 flex-1'}>
             {DatePill}
             {CityPill}
@@ -58,7 +58,7 @@ function SelectedFilterPills() {
 
             {hasFilters && <div onClick={clearFilters} className="badge badge-ghost badge-lg cursor-pointer">Clear filters <Bomb /></div>}
         </div>
-        <label htmlFor="drawer-toggle" className="btn drawer-button lg:hidden shrink-0 m-2">
+        <label htmlFor="drawer-toggle" aria-label="Open filters" className="btn drawer-button lg:hidden shrink-0 m-2">
             <Funnel />
         </label>
     </div>
