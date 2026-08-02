@@ -58,7 +58,7 @@ export function Listings() {
 
         return <span>
             <div className="flex flex-wrap">
-                <span className="">
+                <span className="ml-3">
                     <span className="countdown pr-1">
                       <span style={{"--value": listingsToShow.length} as React.CSSProperties } aria-live="polite" aria-label={"" +listingsToShow.length}>{listingsToShow.length} </span>
                     </span>
