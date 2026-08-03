@@ -23,6 +23,7 @@ vi.mock("../notifications/discord/client", () => ({
 }));
 
 let generateOpeningSoonAnnouncements: typeof import("./openingSoonAnnouncements").generateOpeningSoonAnnouncements;
+let findPendingOpeningSoonAnnouncements: typeof import("./openingSoonAnnouncements").findPendingOpeningSoonAnnouncements;
 let getDB: typeof import("../db/client").getDB;
 let schema: typeof import("../db/schema");
 let watchVenue: typeof import("../db/watchedTheaters").watchVenue;
@@ -85,7 +86,7 @@ beforeEach(async () => {
     tempDirs.push(dbDir);
     process.env.THEATER_SCRAPER_DB_FILE = join(dbDir, "test.db");
 
-    ({ generateOpeningSoonAnnouncements } = await import("./openingSoonAnnouncements"));
+    ({ generateOpeningSoonAnnouncements, findPendingOpeningSoonAnnouncements } = await import("./openingSoonAnnouncements"));
     ({ getDB } = await import("../db/client"));
     schema = await import("../db/schema");
     ({ watchVenue } = await import("../db/watchedTheaters"));
@@ -151,7 +152,22 @@ describe("generateOpeningSoonAnnouncements", () => {
         expect(sentMessages).toHaveLength(0);
     });
 
-    it("ignoreAlreadyAnnounced resends an already-announced listing", async () => {
+    it("uses referenceDate to shift the 14-day window instead of the real clock", async () => {
+        const { venueId } = await seedListing(daysFromNow(20));
+        const channelId = uniqueId("channel");
+        await watchVenue(channelId, venueId);
+        await subscribeChannel(channelId);
+
+        const real = await generateOpeningSoonAnnouncements();
+        expect(real.announcementsSent).toBe(0);
+        expect(sentMessages).toHaveLength(0);
+
+        const shifted = await generateOpeningSoonAnnouncements({ referenceDate: daysFromNow(10) });
+        expect(shifted.announcementsSent).toBe(1);
+        expect(sentMessages).toHaveLength(1);
+    });
+
+    it("still enforces dedupe even when referenceDate simulates a different day", async () => {
         const { venueId } = await seedListing(daysFromNow(5));
         const channelId = uniqueId("channel");
         await watchVenue(channelId, venueId);
@@ -160,10 +176,12 @@ describe("generateOpeningSoonAnnouncements", () => {
         await generateOpeningSoonAnnouncements();
         sentMessages.length = 0;
 
-        const result = await generateOpeningSoonAnnouncements({ ignoreAlreadyAnnounced: true });
+        // Replaces the old ignoreAlreadyAnnounced bypass: simulating a different "today"
+        // still can't resend a performance/channel pair that's already been announced.
+        const result = await generateOpeningSoonAnnouncements({ referenceDate: daysFromNow(1) });
 
-        expect(result.announcementsSent).toBe(1);
-        expect(sentMessages).toHaveLength(1);
+        expect(result.announcementsSent).toBe(0);
+        expect(sentMessages).toHaveLength(0);
     });
 
     it("does not cross-announce: a channel only hears about theaters watched in that channel", async () => {
@@ -191,5 +209,20 @@ describe("generateOpeningSoonAnnouncements", () => {
         expect(sentToA[0].content).not.toContain(theaterB.venueName);
         expect(sentToB[0].content).toContain(theaterB.venueName);
         expect(sentToB[0].content).not.toContain(theaterA.venueName);
+    });
+});
+
+describe("findPendingOpeningSoonAnnouncements", () => {
+    it("reflects exactly what generateOpeningSoonAnnouncements would send, before and after sending", async () => {
+        const { venueId } = await seedListing(daysFromNow(5));
+        const channelId = uniqueId("channel");
+        await watchVenue(channelId, venueId);
+        await subscribeChannel(channelId);
+
+        expect(await findPendingOpeningSoonAnnouncements()).toHaveLength(1);
+
+        await generateOpeningSoonAnnouncements();
+
+        expect(await findPendingOpeningSoonAnnouncements()).toHaveLength(0);
     });
 });

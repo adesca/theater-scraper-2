@@ -1,4 +1,4 @@
-import { and, eq, like } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { getDB } from "./client";
 import { venues, watchedTheaters } from "./schema";
 
@@ -50,41 +50,12 @@ export async function listWatchedVenues(discordChannelId: string): Promise<Watch
         .where(eq(watchedTheaters.discordChannelId, discordChannelId));
 }
 
-/** Venue name matches for slash command autocomplete, not yet watched by this channel. */
-export async function searchUnwatchedVenues(
-    discordChannelId: string,
-    query: string,
-    limit: number,
-): Promise<WatchedVenue[]> {
+/** All known theaters, for the /watch-theater multi-select editor. */
+export async function listAllVenues(): Promise<WatchedVenue[]> {
     const db = getDB();
-
-    const watchedIds = (await listWatchedVenues(discordChannelId)).map((v) => v.venueId);
-
-    const rows = await db
-        .select({ venueId: venues.id, name: venues.name })
-        .from(venues)
-        .where(like(venues.normalizedName, `%${query.toLowerCase()}%`))
-        .limit(limit + watchedIds.length);
-
-    return rows.filter((row) => !watchedIds.includes(row.venueId)).slice(0, limit);
-}
-
-/** Venue name matches for slash command autocomplete, restricted to theaters this channel already watches. */
-export async function searchWatchedVenues(
-    discordChannelId: string,
-    query: string,
-    limit: number,
-): Promise<WatchedVenue[]> {
-    const db = getDB();
-    const normalized = query.toLowerCase();
 
     return db
         .select({ venueId: venues.id, name: venues.name })
-        .from(watchedTheaters)
-        .innerJoin(venues, eq(watchedTheaters.venueId, venues.id))
-        .where(and(
-            eq(watchedTheaters.discordChannelId, discordChannelId),
-            like(venues.normalizedName, `%${normalized}%`),
-        ))
-        .limit(limit);
+        .from(venues)
+        .orderBy(asc(venues.name));
 }

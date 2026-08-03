@@ -1,5 +1,6 @@
-import { MessageReaction, PartialMessageReaction, PartialUser, ThreadAutoArchiveDuration, User } from "discord.js";
-import { addThreadInterest, getAnnouncementByMessageId, setAnnouncementThreadId } from "../../db/announcements";
+import { MessageReaction, PartialMessageReaction, PartialUser, User } from "discord.js";
+import { addThreadInterest, getAnnouncementByMessageId } from "../../db/announcements";
+import { createThreadForAnnouncement } from "../../services/threadCreation";
 import { client } from "./client";
 
 const THREAD_EMOJI = "🧵";
@@ -25,23 +26,9 @@ export async function handleThreadReaction(
 
     if (interestedCount < THREAD_CREATION_THRESHOLD) return;
 
-    if (reaction.partial) await reaction.fetch();
-    const message = reaction.message.partial ? await reaction.message.fetch() : reaction.message;
-    if (!message.thread) {
-        const thread = await message.startThread({
-            name: threadName(message.content),
-            autoArchiveDuration: ThreadAutoArchiveDuration.OneWeek,
-        });
-
-        await thread.send(
-            "🧵 A discussion thread was started because at least 3 people are interested — join in!",
-        );
-
-        // Recorded immediately after creation succeeds, so a second reaction landing
-        // before this write completes still sees `discordThreadId` unset at most once;
-        // discord.js also exposes the thread via `message.thread` for the same reason.
-        await setAnnouncementThreadId(announcement.id, thread.id);
-    }
+    // Same creation logic the `/debug` "Trigger Thread Creation" flow uses, just gated
+    // here on the 3-interested-user threshold instead of an admin's explicit Run press.
+    await createThreadForAnnouncement(reaction.message.channelId, reaction.message.id);
 }
 
 async function welcomeIntoExistingThread(threadId: string, user: User | PartialUser): Promise<void> {
@@ -53,11 +40,4 @@ async function welcomeIntoExistingThread(threadId: string, user: User | PartialU
     await thread.send(`👋 <@${user.id}>, join the discussion!`).catch((error: unknown) => {
         console.error(`Failed to welcome user into thread ${threadId}:`, error);
     });
-}
-
-function threadName(messageContent: string): string {
-    const titleLine = messageContent.split("\n").find((line) => line.startsWith("**") && line.endsWith("**"));
-    const title = titleLine?.replace(/\*\*/g, "").trim();
-
-    return (title ? `Discussion: ${title}` : "Discussion").slice(0, 100);
 }

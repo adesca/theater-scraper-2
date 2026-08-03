@@ -7,7 +7,8 @@ import {
     User,
     Interaction,
 } from "discord.js";
-import {handleAutocomplete, handleSlashCommand} from "./commands";
+import {handleSlashCommand} from "./commands";
+import {routeComponentInteraction, routeModalSubmitInteraction} from "./componentRouter";
 import {handleThreadReaction} from "./reactions";
 
 export function registerEvents(client: Client) {
@@ -31,13 +32,18 @@ export function registerEvents(client: Client) {
 }
 
 async function onInteraction(interaction: Interaction) {
-    if (interaction.isAutocomplete()) {
-        await handleAutocomplete(interaction);
+    if (interaction.isChatInputCommand()) {
+        await handleSlashCommand(interaction);
         return;
     }
 
-    if (interaction.isChatInputCommand()) {
-        await handleSlashCommand(interaction);
+    if (interaction.isButton() || interaction.isStringSelectMenu()) {
+        await routeComponentInteraction(interaction);
+        return;
+    }
+
+    if (interaction.isModalSubmit()) {
+        await routeModalSubmitInteraction(interaction);
     }
 }
 

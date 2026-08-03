@@ -15,7 +15,7 @@ export const OPENING_SOON_TYPE = "opening_soon";
 
 const OPENING_SOON_WINDOW_DAYS = 14;
 
-interface OpeningSoonCandidate {
+export interface OpeningSoonCandidate {
     listingId: number;
     discordChannelId: string;
     showTitle: string;
@@ -30,28 +30,65 @@ export interface GenerateOpeningSoonResult {
 }
 
 /**
- * Finds performances opening within the next 14 days at a theater some channel watches,
- * and sends a Discord announcement (recording it afterward) to that channel if it's
- * subscribed and hasn't already received one for that performance. Watches are joined
- * per-channel (not just per-theater) so a channel only ever hears about theaters watched
- * in that same channel, not ones watched by other servers. Reused as-is by the nightly
- * scrape flow and by the `/trigger-coming-soon` debug command --
- * `ignoreAlreadyAnnounced` is the only behavioral difference between the two callers.
+ * Finds performances opening within 14 days of `referenceDate` at a theater some channel
+ * watches. Watches are joined per-channel (not just per-theater) so a channel only ever
+ * hears about theaters watched in that same channel, not ones watched by other servers.
+ * `referenceDate` defaults to now, but the `/debug` UI's "what if today were X" flows pass
+ * a different date to simulate the window without touching the clock.
  */
-export async function generateOpeningSoonAnnouncements(
-    options: { ignoreAlreadyAnnounced?: boolean } = {},
-): Promise<GenerateOpeningSoonResult> {
-    const candidates = await findOpeningSoonCandidates();
-    let announcementsSent = 0;
+export async function findOpeningSoonCandidates(referenceDate: Date = new Date()): Promise<OpeningSoonCandidate[]> {
+    const db = getDB();
+    const windowEnd = new Date(referenceDate.getTime() + OPENING_SOON_WINDOW_DAYS * 24 * 60 * 60 * 1000);
+
+    return db
+        .select({
+            listingId: listings.id,
+            discordChannelId: watchedTheaters.discordChannelId,
+            showTitle: shows.title,
+            venueName: venues.name,
+            startDate: listings.startDate,
+            endDate: listings.endDate,
+            listingUrl: listings.listingUrl,
+        })
+        .from(watchedTheaters)
+        .innerJoin(venues, eq(watchedTheaters.venueId, venues.id))
+        .innerJoin(listings, eq(listings.venueId, venues.id))
+        .innerJoin(shows, eq(listings.showId, shows.id))
+        .innerJoin(subscribedChannels, eq(subscribedChannels.discordChannelId, watchedTheaters.discordChannelId))
+        .where(and(
+            gte(listings.startDate, referenceDate.toISOString()),
+            lte(listings.startDate, windowEnd.toISOString()),
+        ));
+}
+
+/** `findOpeningSoonCandidates()` filtered down to what generateOpeningSoonAnnouncements() would actually send. */
+export async function findPendingOpeningSoonAnnouncements(
+    referenceDate: Date = new Date(),
+): Promise<OpeningSoonCandidate[]> {
+    const candidates = await findOpeningSoonCandidates(referenceDate);
+    const pending: OpeningSoonCandidate[] = [];
 
     for (const candidate of candidates) {
-        if (
-            !options.ignoreAlreadyAnnounced &&
-            await hasAnnounced(candidate.listingId, OPENING_SOON_TYPE, candidate.discordChannelId)
-        ) {
-            continue;
-        }
+        const alreadyAnnounced = await hasAnnounced(candidate.listingId, OPENING_SOON_TYPE, candidate.discordChannelId);
+        if (!alreadyAnnounced) pending.push(candidate);
+    }
 
+    return pending;
+}
+
+/**
+ * Sends a Discord announcement (recording it afterward) for every pending candidate.
+ * Reused as-is by the nightly scrape flow and by `/debug`'s "Trigger Coming Soon" --
+ * `referenceDate` is the only thing that ever differs between callers, and since dedupe
+ * is always enforced, shifting it can never resend something already announced.
+ */
+export async function generateOpeningSoonAnnouncements(
+    options: { referenceDate?: Date } = {},
+): Promise<GenerateOpeningSoonResult> {
+    const pending = await findPendingOpeningSoonAnnouncements(options.referenceDate);
+    let announcementsSent = 0;
+
+    for (const candidate of pending) {
         const message = await sendOpeningSoonMessage(candidate.discordChannelId, candidate);
         // Send failed (bot down, channel gone, missing permissions, ...): nothing is
         // recorded, so the next scrape run will simply try this pairing again.
@@ -70,32 +107,6 @@ export async function generateOpeningSoonAnnouncements(
     }
 
     return { announcementsSent };
-}
-
-async function findOpeningSoonCandidates(): Promise<OpeningSoonCandidate[]> {
-    const db = getDB();
-    const now = new Date();
-    const windowEnd = new Date(now.getTime() + OPENING_SOON_WINDOW_DAYS * 24 * 60 * 60 * 1000);
-
-    return db
-        .select({
-            listingId: listings.id,
-            discordChannelId: watchedTheaters.discordChannelId,
-            showTitle: shows.title,
-            venueName: venues.name,
-            startDate: listings.startDate,
-            endDate: listings.endDate,
-            listingUrl: listings.listingUrl,
-        })
-        .from(watchedTheaters)
-        .innerJoin(venues, eq(watchedTheaters.venueId, venues.id))
-        .innerJoin(listings, eq(listings.venueId, venues.id))
-        .innerJoin(shows, eq(listings.showId, shows.id))
-        .innerJoin(subscribedChannels, eq(subscribedChannels.discordChannelId, watchedTheaters.discordChannelId))
-        .where(and(
-            gte(listings.startDate, now.toISOString()),
-            lte(listings.startDate, windowEnd.toISOString()),
-        ));
 }
 
 async function sendOpeningSoonMessage(channelId: string, candidate: OpeningSoonCandidate) {

@@ -32,10 +32,11 @@ export async function hasAnnounced(
 }
 
 /**
- * Insert, or update in place if this (performance, type, channel) was already announced --
- * reachable via `/trigger-coming-soon`, which resends on purpose. The resend is a new
- * Discord message, so `discordThreadId` resets to null: any thread on the previous message
- * has nothing to do with this one.
+ * Insert, or update in place on a (performance, type, channel) conflict. The generation
+ * service always checks `hasAnnounced()` first, so this should only ever hit the update
+ * path if two generate runs raced on the same candidate -- a defensive fallback, not a
+ * feature. If it ever fires, the write is a new Discord message, so `discordThreadId`
+ * resets to null: any thread on the previous message has nothing to do with this one.
  */
 export async function recordAnnouncement(input: RecordAnnouncementInput): Promise<{ id: number }> {
     const db = getDB();
