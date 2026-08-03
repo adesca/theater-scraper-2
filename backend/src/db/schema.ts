@@ -64,6 +64,65 @@ export const listings = sqliteTable("listings", {
     index("listings_venue_idx").on(table.venueId),
 ]);
 
+/**
+ * A theater a Discord channel wants "opening soon" announcements for. Kept as its own
+ * table (rather than a column on `venues`) because it's user data, not scraped data --
+ * `venues` rows are re-derived by re-scraping, watches are not.
+ *
+ * Scoped to `discordChannelId` (not global) so two servers watching different theaters
+ * don't see each other's announcements: a channel only gets announcements for theaters
+ * watched in that same channel.
+ */
+export const watchedTheaters = sqliteTable("watched_theaters", {
+    id: integer().primaryKey({ autoIncrement: true }),
+    discordChannelId: text().notNull(),
+    venueId: integer().notNull().references(() => venues.id),
+    createdAt: text().notNull(),
+}, (table) => [
+    uniqueIndex("watched_theaters_channel_venue_idx").on(table.discordChannelId, table.venueId),
+]);
+
+/** A Discord channel that should receive theater announcements. */
+export const subscribedChannels = sqliteTable("subscribed_channels", {
+    id: integer().primaryKey({ autoIncrement: true }),
+    discordChannelId: text().notNull(),
+    createdAt: text().notNull(),
+}, (table) => [
+    uniqueIndex("subscribed_channels_channel_idx").on(table.discordChannelId),
+]);
+
+/**
+ * An append-only record of announcements actually sent -- one row per Discord message,
+ * so one qualifying listing produces one row per subscribed channel. `type` exists so
+ * future announcement kinds (closing soon, newly announced, ...) can share this table
+ * instead of each needing their own.
+ */
+export const announcements = sqliteTable("announcements", {
+    id: integer().primaryKey({ autoIncrement: true }),
+    performanceId: integer().notNull().references(() => listings.id),
+    type: text().notNull(),
+    announcedAt: text().notNull(),
+    discordChannelId: text().notNull(),
+    discordMessageId: text().notNull(),
+    // Set once the 🧵 reaction threshold creates a discussion thread for this message.
+    discordThreadId: text(),
+    sourceUrl: text().notNull(),
+    websiteUrl: text().notNull(),
+}, (table) => [
+    uniqueIndex("announcements_performance_type_channel_idx")
+        .on(table.performanceId, table.type, table.discordChannelId),
+]);
+
+/** One user's 🧵 "interested in a thread" reaction on an announcement message. */
+export const announcementThreadInterest = sqliteTable("announcement_thread_interest", {
+    id: integer().primaryKey({ autoIncrement: true }),
+    announcementId: integer().notNull().references(() => announcements.id),
+    discordUserId: text().notNull(),
+    reactedAt: text().notNull(),
+}, (table) => [
+    uniqueIndex("announcement_thread_interest_user_idx").on(table.announcementId, table.discordUserId),
+]);
+
 export const analyticsEvents = sqliteTable("analytics_events", {
     id: integer().primaryKey({ autoIncrement: true }),
     createdAt: text("created_at").notNull().$defaultFn(() => new Date().toISOString()),

@@ -12,7 +12,7 @@
     "prod": "ENV=prod node dist/server.js",
     "scrape": "tsx src/scripts/scrape.ts --once",
     "test": "tsc -b && vitest",
-    "discord:deploy": "tsx src/scripts/deployDiscordCommands.ts"
+    "discord:deploy": "tsx src/scripts/deployCommands.ts"
   },
   "keywords": [],
   "author": "",

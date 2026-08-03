@@ -7,7 +7,8 @@ import {
     User,
     Interaction,
 } from "discord.js";
-import {handleSlashCommand} from "./commands";
+import {handleAutocomplete, handleSlashCommand} from "./commands";
+import {handleThreadReaction} from "./reactions";
 
 export function registerEvents(client: Client) {
     client.once(Events.ClientReady, () => {
@@ -30,11 +31,14 @@ export function registerEvents(client: Client) {
 }
 
 async function onInteraction(interaction: Interaction) {
-    if (!interaction.isChatInputCommand()) {
+    if (interaction.isAutocomplete()) {
+        await handleAutocomplete(interaction);
         return;
     }
 
-    await handleSlashCommand(interaction);
+    if (interaction.isChatInputCommand()) {
+        await handleSlashCommand(interaction);
+    }
 }
 
 async function onReactionAdded(
@@ -50,6 +54,8 @@ async function onReactionAdded(
         await reaction.fetch();
     }
 
-    // TODO:
-    // Handle 🧵 reactions.
+    await handleThreadReaction(reaction, user);
+
+    // TODO: Handle 🔔 (follow this production) and 🏛️ (follow this theater) reactions
+    // once those features exist.
 }

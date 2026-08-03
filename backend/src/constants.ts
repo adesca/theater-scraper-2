@@ -5,3 +5,6 @@ import { resolve } from "node:path";
 // would mean two different databases (as it already did for the HTTP cache).
 export const DB_FILE_NAME =
     process.env.THEATER_SCRAPER_DB_FILE ?? resolve(__dirname, "..", "data.db");
+
+// The deep link target for "explore more shows at this theater" in Discord announcements.
+export const FRONTEND_URL = process.env.FRONTEND_URL ?? "https://theater.adesca.dev";

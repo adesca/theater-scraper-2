@@ -7,8 +7,14 @@ import { DB_FILE_NAME } from "../constants";
 // The schema is created in code rather than with drizzle-kit migrations: everything in
 // these tables is re-derivable by re-running the scrape, so there is nothing to migrate
 // yet, and a generated migrations folder would have to be located at runtime by a
-// relative path. Once there is user data (favorites, watchlists, user tags) this should
-// become real generated migrations.
+// relative path.
+//
+// watched_theaters / subscribed_channels / announcements / announcement_thread_interest
+// are the first real user data in this database (not re-derivable from a scrape), which
+// is the condition under which this file said migrations should start. Deferred for now
+// to keep the notifications MVP small -- every statement below is still
+// IF NOT EXISTS/idempotent, so switching to generated migrations later is a mechanical
+// change, not a rewrite.
 const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS shows (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -52,6 +58,44 @@ CREATE INDEX IF NOT EXISTS listings_start_date_idx ON listings (startDate);
 CREATE INDEX IF NOT EXISTS listings_end_date_idx ON listings (endDate);
 CREATE INDEX IF NOT EXISTS listings_show_idx ON listings (showId);
 CREATE INDEX IF NOT EXISTS listings_venue_idx ON listings (venueId);
+
+CREATE TABLE IF NOT EXISTS watched_theaters (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    discordChannelId TEXT NOT NULL,
+    venueId          INTEGER NOT NULL REFERENCES venues (id),
+    createdAt        TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS watched_theaters_channel_venue_idx ON watched_theaters (discordChannelId, venueId);
+
+CREATE TABLE IF NOT EXISTS subscribed_channels (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    discordChannelId TEXT NOT NULL,
+    createdAt        TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS subscribed_channels_channel_idx ON subscribed_channels (discordChannelId);
+
+CREATE TABLE IF NOT EXISTS announcements (
+    id               INTEGER PRIMARY KEY AUTOINCREMENT,
+    performanceId    INTEGER NOT NULL REFERENCES listings (id),
+    type             TEXT NOT NULL,
+    announcedAt      TEXT NOT NULL,
+    discordChannelId TEXT NOT NULL,
+    discordMessageId TEXT NOT NULL,
+    discordThreadId  TEXT,
+    sourceUrl        TEXT NOT NULL,
+    websiteUrl       TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS announcements_performance_type_channel_idx
+    ON announcements (performanceId, type, discordChannelId);
+
+CREATE TABLE IF NOT EXISTS announcement_thread_interest (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    announcementId INTEGER NOT NULL REFERENCES announcements (id),
+    discordUserId  TEXT NOT NULL,
+    reactedAt      TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS announcement_thread_interest_user_idx
+    ON announcement_thread_interest (announcementId, discordUserId);
 
 CREATE TABLE IF NOT EXISTS analytics_events (
                                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
