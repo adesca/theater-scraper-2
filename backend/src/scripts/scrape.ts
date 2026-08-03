@@ -1,5 +1,5 @@
 import nodeCron from "node-cron";
-import { ingestAll } from "./ingest";
+import { ingestAll } from "../ingest";
 
 // `--once` is the manual scrape: `npm run scrape`, or `node dist/scrape.js --once` in prod.
 const runOnce = process.argv.includes("--once");

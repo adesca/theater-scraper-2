@@ -7,11 +7,12 @@
     "test": "test"
   },
   "scripts": {
-    "build": "tsx src/scrape.ts --once && tsc",
+    "build": "tsx src/scripts/scrape.ts --once && tsc",
     "dev": "ENV=dev tsx --watch src/server.ts",
     "prod": "ENV=prod node dist/server.js",
-    "scrape": "tsx src/scrape.ts --once",
-    "test": "tsc -b && vitest"
+    "scrape": "tsx src/scripts/scrape.ts --once",
+    "test": "tsc -b && vitest",
+    "discord:deploy": "tsx src/scripts/deployDiscordCommands.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "better-sqlite3": "^12.11.1",
     "cors": "^2.8.6",
     "date-fns": "^4.4.0",
+    "discord.js": "^14.27.0",
     "drizzle-kit": "^1.0.0-rc.4",
     "drizzle-orm": "^1.0.0-rc.4",
     "express": "^5.2.1",
